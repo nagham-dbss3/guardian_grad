@@ -35,7 +35,7 @@ Map<String, dynamic> _$$ChildSummaryImplToJson(_$ChildSummaryImpl instance) =>
 _$GuardianProfileImpl _$$GuardianProfileImplFromJson(
   Map<String, dynamic> json,
 ) => _$GuardianProfileImpl(
-  id: json['id'] as String,
+  id: const FlexibleStringConverter().fromJson(json['id']),
   name: json['name'] as String,
   relationshipToChild: json['relationshipToChild'] as String,
   contactPhone: json['contactPhone'] as String?,
@@ -50,12 +50,28 @@ _$GuardianProfileImpl _$$GuardianProfileImplFromJson(
 Map<String, dynamic> _$$GuardianProfileImplToJson(
   _$GuardianProfileImpl instance,
 ) => <String, dynamic>{
-  'id': instance.id,
+  'id': const FlexibleStringConverter().toJson(instance.id),
   'name': instance.name,
   'relationshipToChild': instance.relationshipToChild,
   'contactPhone': instance.contactPhone,
   'contactEmail': instance.contactEmail,
-  'children': instance.children,
+  'children': instance.children.map((e) => e.toJson()).toList(),
+};
+
+_$ChildrenListResponseImpl _$$ChildrenListResponseImplFromJson(
+  Map<String, dynamic> json,
+) => _$ChildrenListResponseImpl(
+  children:
+      (json['children'] as List<dynamic>?)
+          ?.map((e) => ChildSummary.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <ChildSummary>[],
+);
+
+Map<String, dynamic> _$$ChildrenListResponseImplToJson(
+  _$ChildrenListResponseImpl instance,
+) => <String, dynamic>{
+  'children': instance.children.map((e) => e.toJson()).toList(),
 };
 
 _$DiseaseOverviewImpl _$$DiseaseOverviewImplFromJson(

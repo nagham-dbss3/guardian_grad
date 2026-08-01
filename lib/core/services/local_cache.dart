@@ -6,6 +6,7 @@ import '../../models/guardian_prefs.dart';
 import '../../models/notification_item.dart';
 import '../../models/patient_record.dart';
 import '../../models/child.dart';
+import '../../models/user.dart';
 
 /// Offline-first cache backed by Hive. Models are stored as JSON strings
 /// (json_serializable) rather than typed adapters, which keeps the dependency
@@ -21,6 +22,9 @@ class LocalCache {
   static const _kPrefs = 'prefs';
   static const _kActiveChild = 'activeChild';
   static const _kLoggedIn = 'loggedIn';
+  static const _kAuthUser = 'authUser';
+  static const _kAuthToken = 'authToken';
+  static const _kFcmToken = 'fcmToken';
 
   late Box _box;
   bool _ready = false;
@@ -33,44 +37,80 @@ class LocalCache {
   }
 
   bool get hasData => _box.containsKey(_kRecords);
+  bool get hasGuardian => _box.containsKey(_kGuardian);
 
-  // ---- Auth flag ----------------------------------------------------------
+  // ---- Auth flag / session user -------------------------------------------
 
   bool get isLoggedIn => _box.get(_kLoggedIn, defaultValue: false) as bool;
   Future<void> setLoggedIn(bool value) => _box.put(_kLoggedIn, value);
 
+  Future<void> saveAuthUser(UserModel user) =>
+      _box.put(_kAuthUser, jsonEncode(user.toJson()));
+
+  UserModel? loadAuthUser() {
+    final raw = _box.get(_kAuthUser) as String?;
+    if (raw == null) return null;
+    return UserModel.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  }
+
+  Future<void> clearAuthUser() => _box.delete(_kAuthUser);
+
+  Future<void> saveAuthToken(String token) => _box.put(_kAuthToken, token);
+
+  String? loadAuthToken() => _box.get(_kAuthToken) as String?;
+
+  Future<void> clearAuthToken() => _box.delete(_kAuthToken);
+
   // ---- Guardian -----------------------------------------------------------
 
-  Future<void> saveGuardian(GuardianProfile guardian) =>
-      _box.put(_kGuardian, jsonEncode(guardian.toJson()));
+  Future<void> saveGuardian(GuardianProfile guardian) {
+    final map = Map<String, dynamic>.from(guardian.toJson());
+    // Always persist children as plain maps (never Freezed instances).
+    map['children'] = guardian.children.map((c) => c.toJson()).toList();
+    return _box.put(_kGuardian, jsonEncode(map));
+  }
 
   GuardianProfile? loadGuardian() {
     final raw = _box.get(_kGuardian) as String?;
     if (raw == null) return null;
-    return GuardianProfile.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
-    );
+    try {
+      return GuardianProfile.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>,
+      );
+    } catch (e) {
+      // Corrupt / legacy mock payload — treat as missing.
+      return null;
+    }
   }
+
+  Future<void> clearGuardian() => _box.delete(_kGuardian);
 
   // ---- Records (per child) ------------------------------------------------
 
   Future<void> saveRecords(Map<String, PatientRecord> records) {
-    final encoded = records.map(
-      (key, value) => MapEntry(key, value.toJson()),
-    );
+    final encoded = <String, dynamic>{};
+    for (final entry in records.entries) {
+      final map = Map<String, dynamic>.from(entry.value.toJson());
+      map['child'] = entry.value.child.toJson();
+      encoded[entry.key] = map;
+    }
     return _box.put(_kRecords, jsonEncode(encoded));
   }
 
   Map<String, PatientRecord> loadRecords() {
     final raw = _box.get(_kRecords) as String?;
     if (raw == null) return {};
-    final decoded = jsonDecode(raw) as Map<String, dynamic>;
-    return decoded.map(
-      (key, value) => MapEntry(
-        key,
-        PatientRecord.fromJson(value as Map<String, dynamic>),
-      ),
-    );
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map(
+        (key, value) => MapEntry(
+          key,
+          PatientRecord.fromJson(value as Map<String, dynamic>),
+        ),
+      );
+    } catch (_) {
+      return {};
+    }
   }
 
   Future<void> saveRecord(String fileNo, PatientRecord record) async {
@@ -79,11 +119,15 @@ class LocalCache {
     await saveRecords(all);
   }
 
+  Future<void> clearRecords() => _box.delete(_kRecords);
+
   // ---- Active child -------------------------------------------------------
 
   String? get activeChild => _box.get(_kActiveChild) as String?;
   Future<void> setActiveChild(String fileNo) =>
       _box.put(_kActiveChild, fileNo);
+
+  Future<void> clearActiveChild() => _box.delete(_kActiveChild);
 
   // ---- Notifications ------------------------------------------------------
 
@@ -95,11 +139,25 @@ class LocalCache {
   List<NotificationItem> loadNotifications() {
     final raw = _box.get(_kNotifications) as String?;
     if (raw == null) return [];
-    final list = jsonDecode(raw) as List<dynamic>;
-    return list
-        .map((e) => NotificationItem.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list
+          .map((e) => NotificationItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
+
+  Future<void> clearNotifications() => _box.delete(_kNotifications);
+
+  // ---- FCM device token (last registered) ---------------------------------
+
+  Future<void> saveFcmToken(String token) => _box.put(_kFcmToken, token);
+
+  String? loadFcmToken() => _box.get(_kFcmToken) as String?;
+
+  Future<void> clearFcmToken() => _box.delete(_kFcmToken);
 
   // ---- Prefs --------------------------------------------------------------
 
@@ -109,7 +167,19 @@ class LocalCache {
   GuardianPrefs loadPrefs() {
     final raw = _box.get(_kPrefs) as String?;
     if (raw == null) return const GuardianPrefs();
-    return GuardianPrefs.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    try {
+      return GuardianPrefs.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return const GuardianPrefs();
+    }
+  }
+
+  /// Drops mock/API guardian identity + clinical cache. Keeps prefs + auth keys.
+  Future<void> clearGuardianSessionData() async {
+    await clearGuardian();
+    await clearRecords();
+    await clearNotifications();
+    await clearActiveChild();
   }
 
   Future<void> clear() => _box.clear();

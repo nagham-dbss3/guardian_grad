@@ -4,20 +4,35 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/services/notification_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/initials.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../models/child.dart';
-import '../../auth/presentation/login_screen.dart';
+import '../../auth/data/auth_providers.dart';
 import '../../shared/data/guardian_providers.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh children from API when the profile (switcher) is opened.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(guardianControllerProvider.notifier).syncChildren();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(guardianControllerProvider);
     final controller = ref.read(guardianControllerProvider.notifier);
-    final guardian = state.guardian;
+    final guardian = ref.watch(guardianProfileProvider);
     final prefs = state.prefs;
 
     return Scaffold(
@@ -109,22 +124,6 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
 
-          // Security
-          const SectionHeader(
-              title: 'الحماية (البصمة/الرمز)', icon: Icons.security_rounded),
-          const SizedBox(height: 12),
-          AppCard(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: SwitchListTile(
-              value: prefs.biometricEnabled,
-              activeTrackColor: AppColors.secondary,
-              title: const Text('تفعيل البصمة عند الدخول'),
-              onChanged: (v) =>
-                  controller.updatePrefs(prefs.copyWith(biometricEnabled: v)),
-            ),
-          ),
-          const SizedBox(height: 20),
-
           // Language
           const SectionHeader(title: 'اللغة', icon: Icons.language_rounded),
           const SizedBox(height: 12),
@@ -134,36 +133,6 @@ class ProfileScreen extends ConsumerWidget {
                 Icon(Icons.check_circle_rounded, color: AppColors.success),
                 SizedBox(width: 10),
                 Text('العربية', style: TextStyle(fontWeight: FontWeight.w700)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Dev/mock trigger
-          const SectionHeader(
-              title: 'أدوات تجريبية', icon: Icons.science_rounded),
-          const SizedBox(height: 12),
-          AppCard(
-            color: AppColors.highlightSoft,
-            borderColor: AppColors.highlightSoft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'محاكاة وصول نتيجة جديدة من المخبر (لعرض تدفّق الإشعار '
-                  'دون خادم).',
-                  style: TextStyle(fontSize: 12.5, height: 1.5),
-                ),
-                const SizedBox(height: 10),
-                FilledButton.tonalIcon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF9A7B11),
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () => _simulateResult(context, ref),
-                  icon: const Icon(Icons.notifications_active_rounded),
-                  label: const Text('محاكاة: نتيجة جديدة وصلت'),
-                ),
               ],
             ),
           ),
@@ -184,23 +153,9 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _simulateResult(BuildContext context, WidgetRef ref) async {
-    final controller = ref.read(guardianControllerProvider.notifier);
-    final resultId = await controller.simulateResultArrived();
-    await NotificationService.instance.showLocalNow(
-      title: 'وصلت نتيجة جديدة',
-      body: 'تحقق من نتائج التحاليل.',
-      payload: '/results/$resultId',
-      results: true,
-    );
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم إرسال إشعار محاكاة لوصول النتيجة')),
-      );
-    }
-  }
-
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
+    // Unregister FCM while auth Bearer is still valid, then clear session.
+    await ref.read(guardianControllerProvider.notifier).clearSessionCache();
     await ref.read(authServiceProvider).logout();
     if (context.mounted) context.go('/login');
   }
@@ -231,7 +186,7 @@ class _ChildOption extends StatelessWidget {
               backgroundColor:
                   selected ? AppColors.primary : AppColors.muted,
               child: Text(
-                child.firstName.characters.first,
+                initialLetter(child.firstName),
                 style: TextStyle(
                   color: selected ? Colors.white : AppColors.foreground,
                   fontWeight: FontWeight.w700,

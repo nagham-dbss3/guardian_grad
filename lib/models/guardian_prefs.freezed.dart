@@ -23,7 +23,6 @@ GuardianPrefs _$GuardianPrefsFromJson(Map<String, dynamic> json) {
 mixin _$GuardianPrefs {
   bool get doseReminders => throw _privateConstructorUsedError;
   bool get resultAlerts => throw _privateConstructorUsedError;
-  bool get biometricEnabled => throw _privateConstructorUsedError;
 
   /// Serializes this GuardianPrefs to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,7 +41,7 @@ abstract class $GuardianPrefsCopyWith<$Res> {
     $Res Function(GuardianPrefs) then,
   ) = _$GuardianPrefsCopyWithImpl<$Res, GuardianPrefs>;
   @useResult
-  $Res call({bool doseReminders, bool resultAlerts, bool biometricEnabled});
+  $Res call({bool doseReminders, bool resultAlerts});
 }
 
 /// @nodoc
@@ -59,11 +58,7 @@ class _$GuardianPrefsCopyWithImpl<$Res, $Val extends GuardianPrefs>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? doseReminders = null,
-    Object? resultAlerts = null,
-    Object? biometricEnabled = null,
-  }) {
+  $Res call({Object? doseReminders = null, Object? resultAlerts = null}) {
     return _then(
       _value.copyWith(
             doseReminders: null == doseReminders
@@ -73,10 +68,6 @@ class _$GuardianPrefsCopyWithImpl<$Res, $Val extends GuardianPrefs>
             resultAlerts: null == resultAlerts
                 ? _value.resultAlerts
                 : resultAlerts // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            biometricEnabled: null == biometricEnabled
-                ? _value.biometricEnabled
-                : biometricEnabled // ignore: cast_nullable_to_non_nullable
                       as bool,
           )
           as $Val,
@@ -93,7 +84,7 @@ abstract class _$$GuardianPrefsImplCopyWith<$Res>
   ) = __$$GuardianPrefsImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({bool doseReminders, bool resultAlerts, bool biometricEnabled});
+  $Res call({bool doseReminders, bool resultAlerts});
 }
 
 /// @nodoc
@@ -109,11 +100,7 @@ class __$$GuardianPrefsImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? doseReminders = null,
-    Object? resultAlerts = null,
-    Object? biometricEnabled = null,
-  }) {
+  $Res call({Object? doseReminders = null, Object? resultAlerts = null}) {
     return _then(
       _$GuardianPrefsImpl(
         doseReminders: null == doseReminders
@@ -123,10 +110,6 @@ class __$$GuardianPrefsImplCopyWithImpl<$Res>
         resultAlerts: null == resultAlerts
             ? _value.resultAlerts
             : resultAlerts // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        biometricEnabled: null == biometricEnabled
-            ? _value.biometricEnabled
-            : biometricEnabled // ignore: cast_nullable_to_non_nullable
                   as bool,
       ),
     );
@@ -139,7 +122,6 @@ class _$GuardianPrefsImpl implements _GuardianPrefs {
   const _$GuardianPrefsImpl({
     this.doseReminders = true,
     this.resultAlerts = true,
-    this.biometricEnabled = true,
   });
 
   factory _$GuardianPrefsImpl.fromJson(Map<String, dynamic> json) =>
@@ -151,13 +133,10 @@ class _$GuardianPrefsImpl implements _GuardianPrefs {
   @override
   @JsonKey()
   final bool resultAlerts;
-  @override
-  @JsonKey()
-  final bool biometricEnabled;
 
   @override
   String toString() {
-    return 'GuardianPrefs(doseReminders: $doseReminders, resultAlerts: $resultAlerts, biometricEnabled: $biometricEnabled)';
+    return 'GuardianPrefs(doseReminders: $doseReminders, resultAlerts: $resultAlerts)';
   }
 
   @override
@@ -168,15 +147,12 @@ class _$GuardianPrefsImpl implements _GuardianPrefs {
             (identical(other.doseReminders, doseReminders) ||
                 other.doseReminders == doseReminders) &&
             (identical(other.resultAlerts, resultAlerts) ||
-                other.resultAlerts == resultAlerts) &&
-            (identical(other.biometricEnabled, biometricEnabled) ||
-                other.biometricEnabled == biometricEnabled));
+                other.resultAlerts == resultAlerts));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, doseReminders, resultAlerts, biometricEnabled);
+  int get hashCode => Object.hash(runtimeType, doseReminders, resultAlerts);
 
   /// Create a copy of GuardianPrefs
   /// with the given fields replaced by the non-null parameter values.
@@ -196,7 +172,6 @@ abstract class _GuardianPrefs implements GuardianPrefs {
   const factory _GuardianPrefs({
     final bool doseReminders,
     final bool resultAlerts,
-    final bool biometricEnabled,
   }) = _$GuardianPrefsImpl;
 
   factory _GuardianPrefs.fromJson(Map<String, dynamic> json) =
@@ -206,8 +181,6 @@ abstract class _GuardianPrefs implements GuardianPrefs {
   bool get doseReminders;
   @override
   bool get resultAlerts;
-  @override
-  bool get biometricEnabled;
 
   /// Create a copy of GuardianPrefs
   /// with the given fields replaced by the non-null parameter values.

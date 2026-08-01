@@ -10,11 +10,25 @@ import '../../../models/notification_item.dart';
 import '../../shared/data/guardian_providers.dart';
 import 'notification_visuals.dart';
 
-class NotificationsScreen extends ConsumerWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(guardianControllerProvider.notifier).syncNotifications();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(guardianControllerProvider);
     final controller = ref.read(guardianControllerProvider.notifier);
     final notifications = state.notifications;
@@ -30,28 +44,39 @@ class NotificationsScreen extends ConsumerWidget {
             ),
         ],
       ),
-      body: notifications.isEmpty
-          ? const EmptyState(
-              message: 'لا توجد إشعارات',
-              icon: Icons.notifications_none_rounded,
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-              itemCount: notifications.length,
-              itemBuilder: (context, i) {
-                final n = notifications[i];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: _NotificationTile(
-                    item: n,
-                    onTap: () {
-                      controller.markNotificationRead(n.id);
-                      if (n.deepLink != null) context.push(n.deepLink!);
-                    },
+      body: RefreshIndicator(
+        onRefresh: controller.syncNotifications,
+        child: notifications.isEmpty
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const [
+                  SizedBox(height: 120),
+                  EmptyState(
+                    message: 'لا توجد إشعارات',
+                    icon: Icons.notifications_none_rounded,
                   ),
-                );
-              },
-            ),
+                ],
+              )
+            : ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                itemCount: notifications.length,
+                itemBuilder: (context, i) {
+                  final n = notifications[i];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _NotificationTile(
+                      item: n,
+                      onTap: () async {
+                        await controller.markNotificationRead(n.id);
+                        if (!context.mounted) return;
+                        context.push(n.route);
+                      },
+                    ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }
@@ -76,18 +101,26 @@ class _NotificationTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(NotificationVisuals.label(item.type),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12.5,
-                      color: NotificationVisuals.color(item.type),
-                    )),
+                Text(
+                  NotificationVisuals.label(item.type),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                    color: NotificationVisuals.color(item.type),
+                  ),
+                ),
+                if (item.message.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(item.message, style: const TextStyle(height: 1.5)),
+                ],
                 const SizedBox(height: 4),
-                Text(item.message, style: const TextStyle(height: 1.5)),
-                const SizedBox(height: 4),
-                Text(DateFormatAr.dayDateTime(item.timestamp),
-                    style: const TextStyle(
-                        color: AppColors.mutedForeground, fontSize: 12)),
+                Text(
+                  DateFormatAr.dayDateTime(item.timestamp),
+                  style: const TextStyle(
+                    color: AppColors.mutedForeground,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),

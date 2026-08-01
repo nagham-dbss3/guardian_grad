@@ -15,8 +15,7 @@ class DischargeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final record = ref.watch(activeRecordProvider);
-    final reports = [...record.dischargeReports]
+    final reports = [...ref.watch(dischargeReportsProvider)]
       ..sort((a, b) => b.generatedAt.compareTo(a.generatedAt));
 
     return Scaffold(

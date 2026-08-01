@@ -22,6 +22,7 @@ StageView _$StageViewFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$StageView {
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(unknownEnumValue: StageStatus.upcoming)
   StageStatus get status => throw _privateConstructorUsedError;
   DateTime? get startDate => throw _privateConstructorUsedError;
   DateTime? get endDate => throw _privateConstructorUsedError;
@@ -45,7 +46,7 @@ abstract class $StageViewCopyWith<$Res> {
   @useResult
   $Res call({
     String name,
-    StageStatus status,
+    @JsonKey(unknownEnumValue: StageStatus.upcoming) StageStatus status,
     DateTime? startDate,
     DateTime? endDate,
     String? medsSummary,
@@ -118,7 +119,7 @@ abstract class _$$StageViewImplCopyWith<$Res>
   @useResult
   $Res call({
     String name,
-    StageStatus status,
+    @JsonKey(unknownEnumValue: StageStatus.upcoming) StageStatus status,
     DateTime? startDate,
     DateTime? endDate,
     String? medsSummary,
@@ -183,7 +184,7 @@ class __$$StageViewImplCopyWithImpl<$Res>
 class _$StageViewImpl implements _StageView {
   const _$StageViewImpl({
     required this.name,
-    required this.status,
+    @JsonKey(unknownEnumValue: StageStatus.upcoming) required this.status,
     this.startDate,
     this.endDate,
     this.medsSummary,
@@ -196,6 +197,7 @@ class _$StageViewImpl implements _StageView {
   @override
   final String name;
   @override
+  @JsonKey(unknownEnumValue: StageStatus.upcoming)
   final StageStatus status;
   @override
   final DateTime? startDate;
@@ -256,6 +258,7 @@ class _$StageViewImpl implements _StageView {
 abstract class _StageView implements StageView {
   const factory _StageView({
     required final String name,
+    @JsonKey(unknownEnumValue: StageStatus.upcoming)
     required final StageStatus status,
     final DateTime? startDate,
     final DateTime? endDate,
@@ -269,6 +272,7 @@ abstract class _StageView implements StageView {
   @override
   String get name;
   @override
+  @JsonKey(unknownEnumValue: StageStatus.upcoming)
   StageStatus get status;
   @override
   DateTime? get startDate;
@@ -392,7 +396,7 @@ class __$$TreatmentPlanViewImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$TreatmentPlanViewImpl implements _TreatmentPlanView {
   const _$TreatmentPlanViewImpl({
-    required this.planName,
+    this.planName = '',
     final List<StageView> stages = const <StageView>[],
   }) : _stages = stages;
 
@@ -400,6 +404,7 @@ class _$TreatmentPlanViewImpl implements _TreatmentPlanView {
       _$$TreatmentPlanViewImplFromJson(json);
 
   @override
+  @JsonKey()
   final String planName;
   final List<StageView> _stages;
   @override
@@ -452,7 +457,7 @@ class _$TreatmentPlanViewImpl implements _TreatmentPlanView {
 
 abstract class _TreatmentPlanView implements TreatmentPlanView {
   const factory _TreatmentPlanView({
-    required final String planName,
+    final String planName,
     final List<StageView> stages,
   }) = _$TreatmentPlanViewImpl;
 

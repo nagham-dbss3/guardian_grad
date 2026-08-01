@@ -16,8 +16,7 @@ class ResultsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final record = ref.watch(activeRecordProvider);
-    final results = record.labResults;
+    final results = ref.watch(labResultsProvider);
 
     if (results.isEmpty) {
       return const EmptyState(

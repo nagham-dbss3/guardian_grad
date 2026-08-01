@@ -9,7 +9,6 @@ class GuardianPrefs with _$GuardianPrefs {
   const factory GuardianPrefs({
     @Default(true) bool doseReminders,
     @Default(true) bool resultAlerts,
-    @Default(true) bool biometricEnabled,
   }) = _GuardianPrefs;
 
   factory GuardianPrefs.fromJson(Map<String, dynamic> json) =>

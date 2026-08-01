@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/radii.dart';
 import '../../../core/utils/date_format_ar.dart';
+import '../../../core/utils/initials.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../shared/data/guardian_providers.dart';
@@ -16,7 +17,7 @@ class RecordScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final record = ref.watch(activeRecordProvider);
-    final child = record.child;
+    final child = ref.watch(activeChildProvider);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
@@ -34,7 +35,7 @@ class RecordScreen extends ConsumerWidget {
                     radius: 30,
                     backgroundColor: AppColors.primarySoft,
                     child: Text(
-                      child.firstName.characters.first,
+                      initialLetter(child.firstName),
                       style: const TextStyle(
                         color: AppColors.primary,
                         fontSize: 26,

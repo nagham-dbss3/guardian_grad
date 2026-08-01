@@ -16,8 +16,7 @@ class AppointmentsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final record = ref.watch(activeRecordProvider);
-    final appointments = [...record.appointments]
+    final appointments = [...ref.watch(appointmentsProvider)]
       ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
     final nextDose = appointments.where((a) => a.isNextDose).toList();
     final others = appointments.where((a) => !a.isNextDose).toList();

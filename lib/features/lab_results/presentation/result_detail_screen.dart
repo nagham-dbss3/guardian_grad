@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:printing/printing.dart';
 
-import '../../../core/services/pdf_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/radii.dart';
 import '../../../core/utils/date_format_ar.dart';
@@ -21,12 +21,12 @@ class ResultDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ResultDetailScreenState extends ConsumerState<ResultDetailScreen> {
-  bool _sharing = false;
+  bool _downloading = false;
 
   @override
   void initState() {
     super.initState();
-    // Mark as read once opened (links from the results notification).
+    // Mark as read once opened (PATCH API + local Hive cache).
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(guardianControllerProvider.notifier)
@@ -103,8 +103,6 @@ class _ResultDetailScreenState extends ConsumerState<ResultDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // PDF view placeholder (mock PDF). The generated PDF is what
-                // gets shared/exported.
                 AppCard(
                   child: Column(
                     children: [
@@ -115,17 +113,17 @@ class _ResultDetailScreenState extends ConsumerState<ResultDetailScreen> {
                           style: TextStyle(fontWeight: FontWeight.w700)),
                       const SizedBox(height: 4),
                       const Text(
-                        'يمكنكم عرض النسخة أو مشاركتها مع الطبيب.',
+                        'يمكنكم تحميل النسخة الرسمية وعرضها.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: AppColors.mutedForeground, fontSize: 12.5),
                       ),
                       const SizedBox(height: 14),
                       PrimaryButton(
-                        label: 'عرض / مشاركة PDF',
-                        icon: Icons.ios_share_rounded,
-                        loading: _sharing,
-                        onPressed: () => _share(result, record.child.fullName),
+                        label: 'تحميل / عرض الملف',
+                        icon: Icons.download_rounded,
+                        loading: _downloading,
+                        onPressed: () => _downloadAndOpen(result),
                       ),
                     ],
                   ),
@@ -135,18 +133,24 @@ class _ResultDetailScreenState extends ConsumerState<ResultDetailScreen> {
     );
   }
 
-  Future<void> _share(LabResultView result, String childName) async {
-    setState(() => _sharing = true);
+  Future<void> _downloadAndOpen(LabResultView result) async {
+    setState(() => _downloading = true);
     try {
-      await PdfService.instance.shareLabResult(result, childName);
+      final bytes = await ref
+          .read(guardianControllerProvider.notifier)
+          .downloadLabResultPdf(result.id);
+      await Printing.layoutPdf(
+        name: 'lab_result_${result.id}.pdf',
+        onLayout: (_) async => bytes,
+      );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذّر إنشاء الملف: $e')),
+          SnackBar(content: Text('تعذّر تحميل الملف: $e')),
         );
       }
     } finally {
-      if (mounted) setState(() => _sharing = false);
+      if (mounted) setState(() => _downloading = false);
     }
   }
 

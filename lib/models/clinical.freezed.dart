@@ -214,7 +214,7 @@ class _$LabResultViewImpl implements _LabResultView {
     required this.testType,
     required this.resultDate,
     required this.status,
-    required this.pdfPath,
+    this.pdfPath = '',
     this.isRead = false,
     this.isBiopsy = false,
     this.summary,
@@ -232,6 +232,7 @@ class _$LabResultViewImpl implements _LabResultView {
   @override
   final String status;
   @override
+  @JsonKey()
   final String pdfPath;
   @override
   @JsonKey()
@@ -299,7 +300,7 @@ abstract class _LabResultView implements LabResultView {
     required final String testType,
     required final DateTime resultDate,
     required final String status,
-    required final String pdfPath,
+    final String pdfPath,
     final bool isRead,
     final bool isBiopsy,
     final String? summary,
@@ -330,6 +331,175 @@ abstract class _LabResultView implements LabResultView {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$LabResultViewImplCopyWith<_$LabResultViewImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+LabResultsResponse _$LabResultsResponseFromJson(Map<String, dynamic> json) {
+  return _LabResultsResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$LabResultsResponse {
+  List<LabResultView> get labResults => throw _privateConstructorUsedError;
+
+  /// Serializes this LabResultsResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of LabResultsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $LabResultsResponseCopyWith<LabResultsResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $LabResultsResponseCopyWith<$Res> {
+  factory $LabResultsResponseCopyWith(
+    LabResultsResponse value,
+    $Res Function(LabResultsResponse) then,
+  ) = _$LabResultsResponseCopyWithImpl<$Res, LabResultsResponse>;
+  @useResult
+  $Res call({List<LabResultView> labResults});
+}
+
+/// @nodoc
+class _$LabResultsResponseCopyWithImpl<$Res, $Val extends LabResultsResponse>
+    implements $LabResultsResponseCopyWith<$Res> {
+  _$LabResultsResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of LabResultsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? labResults = null}) {
+    return _then(
+      _value.copyWith(
+            labResults: null == labResults
+                ? _value.labResults
+                : labResults // ignore: cast_nullable_to_non_nullable
+                      as List<LabResultView>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$LabResultsResponseImplCopyWith<$Res>
+    implements $LabResultsResponseCopyWith<$Res> {
+  factory _$$LabResultsResponseImplCopyWith(
+    _$LabResultsResponseImpl value,
+    $Res Function(_$LabResultsResponseImpl) then,
+  ) = __$$LabResultsResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<LabResultView> labResults});
+}
+
+/// @nodoc
+class __$$LabResultsResponseImplCopyWithImpl<$Res>
+    extends _$LabResultsResponseCopyWithImpl<$Res, _$LabResultsResponseImpl>
+    implements _$$LabResultsResponseImplCopyWith<$Res> {
+  __$$LabResultsResponseImplCopyWithImpl(
+    _$LabResultsResponseImpl _value,
+    $Res Function(_$LabResultsResponseImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of LabResultsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? labResults = null}) {
+    return _then(
+      _$LabResultsResponseImpl(
+        labResults: null == labResults
+            ? _value._labResults
+            : labResults // ignore: cast_nullable_to_non_nullable
+                  as List<LabResultView>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$LabResultsResponseImpl implements _LabResultsResponse {
+  const _$LabResultsResponseImpl({
+    final List<LabResultView> labResults = const <LabResultView>[],
+  }) : _labResults = labResults;
+
+  factory _$LabResultsResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$LabResultsResponseImplFromJson(json);
+
+  final List<LabResultView> _labResults;
+  @override
+  @JsonKey()
+  List<LabResultView> get labResults {
+    if (_labResults is EqualUnmodifiableListView) return _labResults;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_labResults);
+  }
+
+  @override
+  String toString() {
+    return 'LabResultsResponse(labResults: $labResults)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$LabResultsResponseImpl &&
+            const DeepCollectionEquality().equals(
+              other._labResults,
+              _labResults,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_labResults),
+  );
+
+  /// Create a copy of LabResultsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$LabResultsResponseImplCopyWith<_$LabResultsResponseImpl> get copyWith =>
+      __$$LabResultsResponseImplCopyWithImpl<_$LabResultsResponseImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$LabResultsResponseImplToJson(this);
+  }
+}
+
+abstract class _LabResultsResponse implements LabResultsResponse {
+  const factory _LabResultsResponse({final List<LabResultView> labResults}) =
+      _$LabResultsResponseImpl;
+
+  factory _LabResultsResponse.fromJson(Map<String, dynamic> json) =
+      _$LabResultsResponseImpl.fromJson;
+
+  @override
+  List<LabResultView> get labResults;
+
+  /// Create a copy of LabResultsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$LabResultsResponseImplCopyWith<_$LabResultsResponseImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -543,8 +713,7 @@ mixin _$DischargeReportView {
   List<PrescriptionItem> get prescription => throw _privateConstructorUsedError;
   String get doctorInstructions => throw _privateConstructorUsedError;
   DateTime get nextDoseDate => throw _privateConstructorUsedError;
-  String get nextVisitDepartment =>
-      throw _privateConstructorUsedError; // e.g. نهاري / داخلي
+  String get nextVisitDepartment => throw _privateConstructorUsedError;
   DateTime get generatedAt => throw _privateConstructorUsedError;
   bool get exportable => throw _privateConstructorUsedError;
 
@@ -731,9 +900,9 @@ class _$DischargeReportViewImpl implements _DischargeReportView {
     required this.id,
     required this.lastDoseDate,
     final List<PrescriptionItem> prescription = const <PrescriptionItem>[],
-    required this.doctorInstructions,
+    this.doctorInstructions = '',
     required this.nextDoseDate,
-    required this.nextVisitDepartment,
+    this.nextVisitDepartment = '',
     required this.generatedAt,
     this.exportable = true,
   }) : _prescription = prescription;
@@ -755,12 +924,13 @@ class _$DischargeReportViewImpl implements _DischargeReportView {
   }
 
   @override
+  @JsonKey()
   final String doctorInstructions;
   @override
   final DateTime nextDoseDate;
   @override
+  @JsonKey()
   final String nextVisitDepartment;
-  // e.g. نهاري / داخلي
   @override
   final DateTime generatedAt;
   @override
@@ -832,9 +1002,9 @@ abstract class _DischargeReportView implements DischargeReportView {
     required final String id,
     required final DateTime lastDoseDate,
     final List<PrescriptionItem> prescription,
-    required final String doctorInstructions,
+    final String doctorInstructions,
     required final DateTime nextDoseDate,
-    required final String nextVisitDepartment,
+    final String nextVisitDepartment,
     required final DateTime generatedAt,
     final bool exportable,
   }) = _$DischargeReportViewImpl;
@@ -853,7 +1023,7 @@ abstract class _DischargeReportView implements DischargeReportView {
   @override
   DateTime get nextDoseDate;
   @override
-  String get nextVisitDepartment; // e.g. نهاري / داخلي
+  String get nextVisitDepartment;
   @override
   DateTime get generatedAt;
   @override
@@ -867,16 +1037,578 @@ abstract class _DischargeReportView implements DischargeReportView {
       throw _privateConstructorUsedError;
 }
 
+DischargeReportsResponse _$DischargeReportsResponseFromJson(
+  Map<String, dynamic> json,
+) {
+  return _DischargeReportsResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DischargeReportsResponse {
+  List<DischargeReportView> get dischargeReports =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this DischargeReportsResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DischargeReportsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DischargeReportsResponseCopyWith<DischargeReportsResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DischargeReportsResponseCopyWith<$Res> {
+  factory $DischargeReportsResponseCopyWith(
+    DischargeReportsResponse value,
+    $Res Function(DischargeReportsResponse) then,
+  ) = _$DischargeReportsResponseCopyWithImpl<$Res, DischargeReportsResponse>;
+  @useResult
+  $Res call({List<DischargeReportView> dischargeReports});
+}
+
+/// @nodoc
+class _$DischargeReportsResponseCopyWithImpl<
+  $Res,
+  $Val extends DischargeReportsResponse
+>
+    implements $DischargeReportsResponseCopyWith<$Res> {
+  _$DischargeReportsResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DischargeReportsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? dischargeReports = null}) {
+    return _then(
+      _value.copyWith(
+            dischargeReports: null == dischargeReports
+                ? _value.dischargeReports
+                : dischargeReports // ignore: cast_nullable_to_non_nullable
+                      as List<DischargeReportView>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$DischargeReportsResponseImplCopyWith<$Res>
+    implements $DischargeReportsResponseCopyWith<$Res> {
+  factory _$$DischargeReportsResponseImplCopyWith(
+    _$DischargeReportsResponseImpl value,
+    $Res Function(_$DischargeReportsResponseImpl) then,
+  ) = __$$DischargeReportsResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<DischargeReportView> dischargeReports});
+}
+
+/// @nodoc
+class __$$DischargeReportsResponseImplCopyWithImpl<$Res>
+    extends
+        _$DischargeReportsResponseCopyWithImpl<
+          $Res,
+          _$DischargeReportsResponseImpl
+        >
+    implements _$$DischargeReportsResponseImplCopyWith<$Res> {
+  __$$DischargeReportsResponseImplCopyWithImpl(
+    _$DischargeReportsResponseImpl _value,
+    $Res Function(_$DischargeReportsResponseImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of DischargeReportsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? dischargeReports = null}) {
+    return _then(
+      _$DischargeReportsResponseImpl(
+        dischargeReports: null == dischargeReports
+            ? _value._dischargeReports
+            : dischargeReports // ignore: cast_nullable_to_non_nullable
+                  as List<DischargeReportView>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DischargeReportsResponseImpl implements _DischargeReportsResponse {
+  const _$DischargeReportsResponseImpl({
+    final List<DischargeReportView> dischargeReports =
+        const <DischargeReportView>[],
+  }) : _dischargeReports = dischargeReports;
+
+  factory _$DischargeReportsResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DischargeReportsResponseImplFromJson(json);
+
+  final List<DischargeReportView> _dischargeReports;
+  @override
+  @JsonKey()
+  List<DischargeReportView> get dischargeReports {
+    if (_dischargeReports is EqualUnmodifiableListView)
+      return _dischargeReports;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_dischargeReports);
+  }
+
+  @override
+  String toString() {
+    return 'DischargeReportsResponse(dischargeReports: $dischargeReports)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DischargeReportsResponseImpl &&
+            const DeepCollectionEquality().equals(
+              other._dischargeReports,
+              _dischargeReports,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_dischargeReports),
+  );
+
+  /// Create a copy of DischargeReportsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DischargeReportsResponseImplCopyWith<_$DischargeReportsResponseImpl>
+  get copyWith =>
+      __$$DischargeReportsResponseImplCopyWithImpl<
+        _$DischargeReportsResponseImpl
+      >(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DischargeReportsResponseImplToJson(this);
+  }
+}
+
+abstract class _DischargeReportsResponse implements DischargeReportsResponse {
+  const factory _DischargeReportsResponse({
+    final List<DischargeReportView> dischargeReports,
+  }) = _$DischargeReportsResponseImpl;
+
+  factory _DischargeReportsResponse.fromJson(Map<String, dynamic> json) =
+      _$DischargeReportsResponseImpl.fromJson;
+
+  @override
+  List<DischargeReportView> get dischargeReports;
+
+  /// Create a copy of DischargeReportsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DischargeReportsResponseImplCopyWith<_$DischargeReportsResponseImpl>
+  get copyWith => throw _privateConstructorUsedError;
+}
+
+DoseReminderModel _$DoseReminderModelFromJson(Map<String, dynamic> json) {
+  return _DoseReminderModel.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DoseReminderModel {
+  DateTime? get nextDoseDate => throw _privateConstructorUsedError;
+  String? get message => throw _privateConstructorUsedError;
+  String? get notes => throw _privateConstructorUsedError;
+
+  /// Serializes this DoseReminderModel to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DoseReminderModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DoseReminderModelCopyWith<DoseReminderModel> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DoseReminderModelCopyWith<$Res> {
+  factory $DoseReminderModelCopyWith(
+    DoseReminderModel value,
+    $Res Function(DoseReminderModel) then,
+  ) = _$DoseReminderModelCopyWithImpl<$Res, DoseReminderModel>;
+  @useResult
+  $Res call({DateTime? nextDoseDate, String? message, String? notes});
+}
+
+/// @nodoc
+class _$DoseReminderModelCopyWithImpl<$Res, $Val extends DoseReminderModel>
+    implements $DoseReminderModelCopyWith<$Res> {
+  _$DoseReminderModelCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DoseReminderModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? nextDoseDate = freezed,
+    Object? message = freezed,
+    Object? notes = freezed,
+  }) {
+    return _then(
+      _value.copyWith(
+            nextDoseDate: freezed == nextDoseDate
+                ? _value.nextDoseDate
+                : nextDoseDate // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
+            message: freezed == message
+                ? _value.message
+                : message // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            notes: freezed == notes
+                ? _value.notes
+                : notes // ignore: cast_nullable_to_non_nullable
+                      as String?,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$DoseReminderModelImplCopyWith<$Res>
+    implements $DoseReminderModelCopyWith<$Res> {
+  factory _$$DoseReminderModelImplCopyWith(
+    _$DoseReminderModelImpl value,
+    $Res Function(_$DoseReminderModelImpl) then,
+  ) = __$$DoseReminderModelImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({DateTime? nextDoseDate, String? message, String? notes});
+}
+
+/// @nodoc
+class __$$DoseReminderModelImplCopyWithImpl<$Res>
+    extends _$DoseReminderModelCopyWithImpl<$Res, _$DoseReminderModelImpl>
+    implements _$$DoseReminderModelImplCopyWith<$Res> {
+  __$$DoseReminderModelImplCopyWithImpl(
+    _$DoseReminderModelImpl _value,
+    $Res Function(_$DoseReminderModelImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of DoseReminderModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? nextDoseDate = freezed,
+    Object? message = freezed,
+    Object? notes = freezed,
+  }) {
+    return _then(
+      _$DoseReminderModelImpl(
+        nextDoseDate: freezed == nextDoseDate
+            ? _value.nextDoseDate
+            : nextDoseDate // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
+        message: freezed == message
+            ? _value.message
+            : message // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        notes: freezed == notes
+            ? _value.notes
+            : notes // ignore: cast_nullable_to_non_nullable
+                  as String?,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DoseReminderModelImpl implements _DoseReminderModel {
+  const _$DoseReminderModelImpl({this.nextDoseDate, this.message, this.notes});
+
+  factory _$DoseReminderModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DoseReminderModelImplFromJson(json);
+
+  @override
+  final DateTime? nextDoseDate;
+  @override
+  final String? message;
+  @override
+  final String? notes;
+
+  @override
+  String toString() {
+    return 'DoseReminderModel(nextDoseDate: $nextDoseDate, message: $message, notes: $notes)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DoseReminderModelImpl &&
+            (identical(other.nextDoseDate, nextDoseDate) ||
+                other.nextDoseDate == nextDoseDate) &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.notes, notes) || other.notes == notes));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, nextDoseDate, message, notes);
+
+  /// Create a copy of DoseReminderModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DoseReminderModelImplCopyWith<_$DoseReminderModelImpl> get copyWith =>
+      __$$DoseReminderModelImplCopyWithImpl<_$DoseReminderModelImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DoseReminderModelImplToJson(this);
+  }
+}
+
+abstract class _DoseReminderModel implements DoseReminderModel {
+  const factory _DoseReminderModel({
+    final DateTime? nextDoseDate,
+    final String? message,
+    final String? notes,
+  }) = _$DoseReminderModelImpl;
+
+  factory _DoseReminderModel.fromJson(Map<String, dynamic> json) =
+      _$DoseReminderModelImpl.fromJson;
+
+  @override
+  DateTime? get nextDoseDate;
+  @override
+  String? get message;
+  @override
+  String? get notes;
+
+  /// Create a copy of DoseReminderModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DoseReminderModelImplCopyWith<_$DoseReminderModelImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+DoseReminderResponse _$DoseReminderResponseFromJson(Map<String, dynamic> json) {
+  return _DoseReminderResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$DoseReminderResponse {
+  DoseReminderModel? get doseReminder => throw _privateConstructorUsedError;
+
+  /// Serializes this DoseReminderResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of DoseReminderResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $DoseReminderResponseCopyWith<DoseReminderResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $DoseReminderResponseCopyWith<$Res> {
+  factory $DoseReminderResponseCopyWith(
+    DoseReminderResponse value,
+    $Res Function(DoseReminderResponse) then,
+  ) = _$DoseReminderResponseCopyWithImpl<$Res, DoseReminderResponse>;
+  @useResult
+  $Res call({DoseReminderModel? doseReminder});
+
+  $DoseReminderModelCopyWith<$Res>? get doseReminder;
+}
+
+/// @nodoc
+class _$DoseReminderResponseCopyWithImpl<
+  $Res,
+  $Val extends DoseReminderResponse
+>
+    implements $DoseReminderResponseCopyWith<$Res> {
+  _$DoseReminderResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of DoseReminderResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? doseReminder = freezed}) {
+    return _then(
+      _value.copyWith(
+            doseReminder: freezed == doseReminder
+                ? _value.doseReminder
+                : doseReminder // ignore: cast_nullable_to_non_nullable
+                      as DoseReminderModel?,
+          )
+          as $Val,
+    );
+  }
+
+  /// Create a copy of DoseReminderResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DoseReminderModelCopyWith<$Res>? get doseReminder {
+    if (_value.doseReminder == null) {
+      return null;
+    }
+
+    return $DoseReminderModelCopyWith<$Res>(_value.doseReminder!, (value) {
+      return _then(_value.copyWith(doseReminder: value) as $Val);
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$$DoseReminderResponseImplCopyWith<$Res>
+    implements $DoseReminderResponseCopyWith<$Res> {
+  factory _$$DoseReminderResponseImplCopyWith(
+    _$DoseReminderResponseImpl value,
+    $Res Function(_$DoseReminderResponseImpl) then,
+  ) = __$$DoseReminderResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({DoseReminderModel? doseReminder});
+
+  @override
+  $DoseReminderModelCopyWith<$Res>? get doseReminder;
+}
+
+/// @nodoc
+class __$$DoseReminderResponseImplCopyWithImpl<$Res>
+    extends _$DoseReminderResponseCopyWithImpl<$Res, _$DoseReminderResponseImpl>
+    implements _$$DoseReminderResponseImplCopyWith<$Res> {
+  __$$DoseReminderResponseImplCopyWithImpl(
+    _$DoseReminderResponseImpl _value,
+    $Res Function(_$DoseReminderResponseImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of DoseReminderResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? doseReminder = freezed}) {
+    return _then(
+      _$DoseReminderResponseImpl(
+        doseReminder: freezed == doseReminder
+            ? _value.doseReminder
+            : doseReminder // ignore: cast_nullable_to_non_nullable
+                  as DoseReminderModel?,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$DoseReminderResponseImpl implements _DoseReminderResponse {
+  const _$DoseReminderResponseImpl({this.doseReminder});
+
+  factory _$DoseReminderResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$DoseReminderResponseImplFromJson(json);
+
+  @override
+  final DoseReminderModel? doseReminder;
+
+  @override
+  String toString() {
+    return 'DoseReminderResponse(doseReminder: $doseReminder)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$DoseReminderResponseImpl &&
+            (identical(other.doseReminder, doseReminder) ||
+                other.doseReminder == doseReminder));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, doseReminder);
+
+  /// Create a copy of DoseReminderResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$DoseReminderResponseImplCopyWith<_$DoseReminderResponseImpl>
+  get copyWith =>
+      __$$DoseReminderResponseImplCopyWithImpl<_$DoseReminderResponseImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$DoseReminderResponseImplToJson(this);
+  }
+}
+
+abstract class _DoseReminderResponse implements DoseReminderResponse {
+  const factory _DoseReminderResponse({final DoseReminderModel? doseReminder}) =
+      _$DoseReminderResponseImpl;
+
+  factory _DoseReminderResponse.fromJson(Map<String, dynamic> json) =
+      _$DoseReminderResponseImpl.fromJson;
+
+  @override
+  DoseReminderModel? get doseReminder;
+
+  /// Create a copy of DoseReminderResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$DoseReminderResponseImplCopyWith<_$DoseReminderResponseImpl>
+  get copyWith => throw _privateConstructorUsedError;
+}
+
 AppointmentView _$AppointmentViewFromJson(Map<String, dynamic> json) {
   return _AppointmentView.fromJson(json);
 }
 
 /// @nodoc
 mixin _$AppointmentView {
+  @FlexibleStringConverter()
   String get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'date_time')
+  @RequiredDateTimeConverter()
   DateTime get dateTime => throw _privateConstructorUsedError;
+  @FlexibleStringConverter()
   String get type => throw _privateConstructorUsedError;
+  @FlexibleStringConverter()
   String get department => throw _privateConstructorUsedError;
+  @JsonKey(name: 'is_next_dose')
   bool get isNextDose => throw _privateConstructorUsedError;
 
   /// Serializes this AppointmentView to a JSON map.
@@ -897,11 +1629,11 @@ abstract class $AppointmentViewCopyWith<$Res> {
   ) = _$AppointmentViewCopyWithImpl<$Res, AppointmentView>;
   @useResult
   $Res call({
-    String id,
-    DateTime dateTime,
-    String type,
-    String department,
-    bool isNextDose,
+    @FlexibleStringConverter() String id,
+    @JsonKey(name: 'date_time') @RequiredDateTimeConverter() DateTime dateTime,
+    @FlexibleStringConverter() String type,
+    @FlexibleStringConverter() String department,
+    @JsonKey(name: 'is_next_dose') bool isNextDose,
   });
 }
 
@@ -964,11 +1696,11 @@ abstract class _$$AppointmentViewImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
-    DateTime dateTime,
-    String type,
-    String department,
-    bool isNextDose,
+    @FlexibleStringConverter() String id,
+    @JsonKey(name: 'date_time') @RequiredDateTimeConverter() DateTime dateTime,
+    @FlexibleStringConverter() String type,
+    @FlexibleStringConverter() String department,
+    @JsonKey(name: 'is_next_dose') bool isNextDose,
   });
 }
 
@@ -1023,26 +1755,36 @@ class __$$AppointmentViewImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AppointmentViewImpl implements _AppointmentView {
   const _$AppointmentViewImpl({
-    required this.id,
+    @FlexibleStringConverter() this.id = '',
+    @JsonKey(name: 'date_time')
+    @RequiredDateTimeConverter()
     required this.dateTime,
-    required this.type,
-    required this.department,
-    this.isNextDose = false,
+    @FlexibleStringConverter() this.type = '',
+    @FlexibleStringConverter() this.department = '',
+    @JsonKey(name: 'is_next_dose') this.isNextDose = false,
   });
 
   factory _$AppointmentViewImpl.fromJson(Map<String, dynamic> json) =>
       _$$AppointmentViewImplFromJson(json);
 
   @override
+  @JsonKey()
+  @FlexibleStringConverter()
   final String id;
   @override
+  @JsonKey(name: 'date_time')
+  @RequiredDateTimeConverter()
   final DateTime dateTime;
   @override
+  @JsonKey()
+  @FlexibleStringConverter()
   final String type;
   @override
+  @JsonKey()
+  @FlexibleStringConverter()
   final String department;
   @override
-  @JsonKey()
+  @JsonKey(name: 'is_next_dose')
   final bool isNextDose;
 
   @override
@@ -1089,25 +1831,33 @@ class _$AppointmentViewImpl implements _AppointmentView {
 
 abstract class _AppointmentView implements AppointmentView {
   const factory _AppointmentView({
-    required final String id,
+    @FlexibleStringConverter() final String id,
+    @JsonKey(name: 'date_time')
+    @RequiredDateTimeConverter()
     required final DateTime dateTime,
-    required final String type,
-    required final String department,
-    final bool isNextDose,
+    @FlexibleStringConverter() final String type,
+    @FlexibleStringConverter() final String department,
+    @JsonKey(name: 'is_next_dose') final bool isNextDose,
   }) = _$AppointmentViewImpl;
 
   factory _AppointmentView.fromJson(Map<String, dynamic> json) =
       _$AppointmentViewImpl.fromJson;
 
   @override
+  @FlexibleStringConverter()
   String get id;
   @override
+  @JsonKey(name: 'date_time')
+  @RequiredDateTimeConverter()
   DateTime get dateTime;
   @override
+  @FlexibleStringConverter()
   String get type;
   @override
+  @FlexibleStringConverter()
   String get department;
   @override
+  @JsonKey(name: 'is_next_dose')
   bool get isNextDose;
 
   /// Create a copy of AppointmentView
@@ -1116,4 +1866,221 @@ abstract class _AppointmentView implements AppointmentView {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AppointmentViewImplCopyWith<_$AppointmentViewImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+ChildAppointmentsResponse _$ChildAppointmentsResponseFromJson(
+  Map<String, dynamic> json,
+) {
+  return _ChildAppointmentsResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ChildAppointmentsResponse {
+  @JsonKey(name: 'patient_file_no')
+  @FlexibleNullableStringConverter()
+  String? get patientFileNo => throw _privateConstructorUsedError;
+  List<AppointmentView> get appointments => throw _privateConstructorUsedError;
+
+  /// Serializes this ChildAppointmentsResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChildAppointmentsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ChildAppointmentsResponseCopyWith<ChildAppointmentsResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChildAppointmentsResponseCopyWith<$Res> {
+  factory $ChildAppointmentsResponseCopyWith(
+    ChildAppointmentsResponse value,
+    $Res Function(ChildAppointmentsResponse) then,
+  ) = _$ChildAppointmentsResponseCopyWithImpl<$Res, ChildAppointmentsResponse>;
+  @useResult
+  $Res call({
+    @JsonKey(name: 'patient_file_no')
+    @FlexibleNullableStringConverter()
+    String? patientFileNo,
+    List<AppointmentView> appointments,
+  });
+}
+
+/// @nodoc
+class _$ChildAppointmentsResponseCopyWithImpl<
+  $Res,
+  $Val extends ChildAppointmentsResponse
+>
+    implements $ChildAppointmentsResponseCopyWith<$Res> {
+  _$ChildAppointmentsResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ChildAppointmentsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? patientFileNo = freezed, Object? appointments = null}) {
+    return _then(
+      _value.copyWith(
+            patientFileNo: freezed == patientFileNo
+                ? _value.patientFileNo
+                : patientFileNo // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            appointments: null == appointments
+                ? _value.appointments
+                : appointments // ignore: cast_nullable_to_non_nullable
+                      as List<AppointmentView>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$ChildAppointmentsResponseImplCopyWith<$Res>
+    implements $ChildAppointmentsResponseCopyWith<$Res> {
+  factory _$$ChildAppointmentsResponseImplCopyWith(
+    _$ChildAppointmentsResponseImpl value,
+    $Res Function(_$ChildAppointmentsResponseImpl) then,
+  ) = __$$ChildAppointmentsResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    @JsonKey(name: 'patient_file_no')
+    @FlexibleNullableStringConverter()
+    String? patientFileNo,
+    List<AppointmentView> appointments,
+  });
+}
+
+/// @nodoc
+class __$$ChildAppointmentsResponseImplCopyWithImpl<$Res>
+    extends
+        _$ChildAppointmentsResponseCopyWithImpl<
+          $Res,
+          _$ChildAppointmentsResponseImpl
+        >
+    implements _$$ChildAppointmentsResponseImplCopyWith<$Res> {
+  __$$ChildAppointmentsResponseImplCopyWithImpl(
+    _$ChildAppointmentsResponseImpl _value,
+    $Res Function(_$ChildAppointmentsResponseImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of ChildAppointmentsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? patientFileNo = freezed, Object? appointments = null}) {
+    return _then(
+      _$ChildAppointmentsResponseImpl(
+        patientFileNo: freezed == patientFileNo
+            ? _value.patientFileNo
+            : patientFileNo // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        appointments: null == appointments
+            ? _value._appointments
+            : appointments // ignore: cast_nullable_to_non_nullable
+                  as List<AppointmentView>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ChildAppointmentsResponseImpl implements _ChildAppointmentsResponse {
+  const _$ChildAppointmentsResponseImpl({
+    @JsonKey(name: 'patient_file_no')
+    @FlexibleNullableStringConverter()
+    this.patientFileNo,
+    final List<AppointmentView> appointments = const <AppointmentView>[],
+  }) : _appointments = appointments;
+
+  factory _$ChildAppointmentsResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChildAppointmentsResponseImplFromJson(json);
+
+  @override
+  @JsonKey(name: 'patient_file_no')
+  @FlexibleNullableStringConverter()
+  final String? patientFileNo;
+  final List<AppointmentView> _appointments;
+  @override
+  @JsonKey()
+  List<AppointmentView> get appointments {
+    if (_appointments is EqualUnmodifiableListView) return _appointments;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_appointments);
+  }
+
+  @override
+  String toString() {
+    return 'ChildAppointmentsResponse(patientFileNo: $patientFileNo, appointments: $appointments)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChildAppointmentsResponseImpl &&
+            (identical(other.patientFileNo, patientFileNo) ||
+                other.patientFileNo == patientFileNo) &&
+            const DeepCollectionEquality().equals(
+              other._appointments,
+              _appointments,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    patientFileNo,
+    const DeepCollectionEquality().hash(_appointments),
+  );
+
+  /// Create a copy of ChildAppointmentsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChildAppointmentsResponseImplCopyWith<_$ChildAppointmentsResponseImpl>
+  get copyWith =>
+      __$$ChildAppointmentsResponseImplCopyWithImpl<
+        _$ChildAppointmentsResponseImpl
+      >(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChildAppointmentsResponseImplToJson(this);
+  }
+}
+
+abstract class _ChildAppointmentsResponse implements ChildAppointmentsResponse {
+  const factory _ChildAppointmentsResponse({
+    @JsonKey(name: 'patient_file_no')
+    @FlexibleNullableStringConverter()
+    final String? patientFileNo,
+    final List<AppointmentView> appointments,
+  }) = _$ChildAppointmentsResponseImpl;
+
+  factory _ChildAppointmentsResponse.fromJson(Map<String, dynamic> json) =
+      _$ChildAppointmentsResponseImpl.fromJson;
+
+  @override
+  @JsonKey(name: 'patient_file_no')
+  @FlexibleNullableStringConverter()
+  String? get patientFileNo;
+  @override
+  List<AppointmentView> get appointments;
+
+  /// Create a copy of ChildAppointmentsResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ChildAppointmentsResponseImplCopyWith<_$ChildAppointmentsResponseImpl>
+  get copyWith => throw _privateConstructorUsedError;
 }

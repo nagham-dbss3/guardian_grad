@@ -6,14 +6,14 @@ import 'package:basma_patient/core/utils/masking.dart';
 void main() {
   test('ChildSummary.fullName joins first and family name', () {
     const child = ChildSummary(
-      fileNoBasma: 'BSM-1',
-      firstName: 'يوسف',
-      familyName: 'الأحمد',
+      fileNoBasma: 'B-1001',
+      firstName: 'تالا',
+      familyName: 'الحلبي',
       age: 7,
-      gender: 'ذكر',
-      currentPhase: 'مرحلة التوحيد',
+      gender: 'أنثى',
+      currentPhase: 'مرحلة الحث',
     );
-    expect(child.fullName, 'يوسف الأحمد');
+    expect(child.fullName, 'تالا الحلبي');
   });
 
   test('Masking.maskId keeps only the last visible digits', () {

@@ -1,59 +1,65 @@
-import 'package:flutter/foundation.dart';
-import 'package:local_auth/local_auth.dart';
-
+import '../../features/auth/data/auth_repository.dart';
+import '../../models/user.dart';
 import 'local_cache.dart';
 
-/// Mock auth — no backend. Any non-empty credentials succeed (after a small
-/// simulated latency). Lockout after [maxAttempts] failed attempts. Biometric /
-/// device PIN via local_auth for fast re-entry.
+/// Authentication façade used by the UI (real API login/logout).
 class AuthService {
-  AuthService(this._cache);
+  AuthService(this._repo, {LocalCache? cache})
+      : _cache = cache ?? LocalCache.instance;
+
+  final AuthRepository _repo;
   final LocalCache _cache;
-  final LocalAuthentication _localAuth = LocalAuthentication();
 
   static const int maxAttempts = 5;
   int _failedAttempts = 0;
+  String? _lastError;
 
   bool get isLockedOut => _failedAttempts >= maxAttempts;
-  int get remainingAttempts => (maxAttempts - _failedAttempts).clamp(0, maxAttempts);
+  int get remainingAttempts =>
+      (maxAttempts - _failedAttempts).clamp(0, maxAttempts);
 
   bool get isLoggedIn => _cache.isLoggedIn;
+  UserModel? get currentUser => _repo.currentUser;
+  String? get lastError => _lastError;
 
-  Future<bool> login(String username, String password) async {
-    if (isLockedOut) return false;
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    final ok = username.trim().isNotEmpty && password.trim().isNotEmpty;
-    if (ok) {
-      _failedAttempts = 0;
-      await _cache.setLoggedIn(true);
-    } else {
-      _failedAttempts++;
+  /// Restores a persisted session at app startup (token + optional `/auth/me`).
+  Future<UserModel?> restoreSession() => _repo.restoreSession();
+
+  /// Authenticates against `POST /auth/login`. Returns `true` on success.
+  /// On failure, [lastError] holds an Arabic message for the login screen.
+  Future<bool> login(String emailOrPhone, String password) async {
+    _lastError = null;
+    if (isLockedOut) {
+      _lastError = 'تم إيقاف الدخول مؤقتًا. حاولوا لاحقًا.';
+      return false;
     }
-    return ok;
+
+    final trimmed = emailOrPhone.trim();
+    if (trimmed.isEmpty || password.isEmpty) {
+      _failedAttempts++;
+      _lastError = 'يرجى إدخال البريد الإلكتروني وكلمة المرور.';
+      return false;
+    }
+
+    try {
+      await _repo.login(email: trimmed, password: password);
+      _failedAttempts = 0;
+      _lastError = null;
+      return true;
+    } on AuthFailure catch (e) {
+      _failedAttempts++;
+      _lastError = e.message;
+      return false;
+    } catch (e) {
+      _failedAttempts++;
+      _lastError = 'حدث خطأ غير متوقع. حاولوا مرة أخرى.';
+      return false;
+    }
   }
 
   Future<void> logout() async {
     _failedAttempts = 0;
-    await _cache.setLoggedIn(false);
-  }
-
-  /// Attempt biometric / device-credential authentication. Returns false (not
-  /// an exception) on unsupported devices so the flow degrades gracefully.
-  Future<bool> authenticateBiometric() async {
-    try {
-      final canCheck = await _localAuth.canCheckBiometrics ||
-          await _localAuth.isDeviceSupported();
-      if (!canCheck) return false;
-      final ok = await _localAuth.authenticate(
-        localizedReason: 'يرجى التحقق للدخول إلى رعاية بسمة',
-        biometricOnly: false,
-        persistAcrossBackgrounding: true,
-      );
-      if (ok) await _cache.setLoggedIn(true);
-      return ok;
-    } catch (e) {
-      debugPrint('Biometric auth unavailable: $e');
-      return false;
-    }
+    _lastError = null;
+    await _repo.logout();
   }
 }

@@ -17,8 +17,7 @@ class JourneyScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final record = ref.watch(activeRecordProvider);
-    final plan = record.treatmentPlan;
+    final plan = ref.watch(treatmentJourneyProvider);
     final completed =
         plan.stages.where((s) => s.status == StageStatus.completed).length;
 

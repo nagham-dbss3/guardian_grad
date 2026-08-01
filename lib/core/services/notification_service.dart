@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -5,10 +8,14 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../models/patient_record.dart';
+import '../utils/json_converters.dart';
 import 'fcm_service.dart';
+import 'local_cache.dart';
 
 /// Façade over FCM (push) + flutter_local_notifications (local + scheduled).
-/// Deep links are surfaced via [onDeepLink], wired by the router.
+///
+/// Device-token sync with the backend is done via [registerDeviceToken] /
+/// [unregisterDeviceToken] callbacks wired from the data layer.
 class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
@@ -18,16 +25,27 @@ class NotificationService {
   late final FcmService _fcm = FcmService(
     onMessage: _handleFcmForeground,
     onMessageOpened: _handleFcmOpened,
+    onTokenRefresh: _handleTokenRefresh,
   );
 
   /// Set by the router so taps navigate to the right screen.
   void Function(String route)? onDeepLink;
+
+  /// Register FCM token with `POST /guardian/device-tokens`.
+  Future<void> Function(String fcmToken, String platform)? registerDeviceToken;
+
+  /// Unregister FCM token with `DELETE /guardian/device-tokens`.
+  Future<void> Function(String fcmToken)? unregisterDeviceToken;
+
+  /// Optional: refresh inbox after a foreground push.
+  Future<void> Function()? onInboxRefresh;
 
   static const _channelId = 'basma_care';
   static const _channelName = 'تذكيرات بسمة';
   static const _resultsChannelId = 'basma_results';
 
   bool _ready = false;
+  bool _syncingToken = false;
 
   Future<void> init() async {
     if (_ready) return;
@@ -57,13 +75,65 @@ class NotificationService {
     _ready = true;
   }
 
-  String? get fcmToken => _fcm.token;
+  String? get fcmToken => _fcm.token ?? LocalCache.instance.loadFcmToken();
   bool get pushAvailable => _fcm.available;
 
+  String get _platform {
+    if (kIsWeb) return 'web';
+    if (Platform.isIOS) return 'ios';
+    if (Platform.isAndroid) return 'android';
+    return 'android';
+  }
+
+  /// Fetch current FCM token (if any) and register it with the backend.
+  Future<void> syncDeviceTokenToServer() async {
+    if (registerDeviceToken == null) return;
+    if (_syncingToken) return;
+    _syncingToken = true;
+    try {
+      final token =
+          await _fcm.refreshToken() ?? LocalCache.instance.loadFcmToken();
+      if (token == null || token.isEmpty) {
+        debugPrint('FCM: no token to register');
+        return;
+      }
+      debugPrint('Registering FCM token with backend ($_platform)...');
+      debugPrint('FCM TOKEN → $token');
+      await LocalCache.instance.saveFcmToken(token);
+      await registerDeviceToken!(token, _platform);
+      debugPrint('FCM device token registered with backend OK');
+    } catch (e) {
+      debugPrint('FCM device token register failed: $e');
+      if (e is DioException) {
+        debugPrint('FCM register response: ${e.response?.data}');
+      }
+    } finally {
+      _syncingToken = false;
+    }
+  }
+
+  /// Unregister the stored FCM token from the backend (call before logout).
+  Future<void> unregisterDeviceTokenFromServer() async {
+    if (unregisterDeviceToken == null) return;
+    try {
+      final token =
+          _fcm.token ?? LocalCache.instance.loadFcmToken();
+      if (token == null || token.isEmpty) return;
+      await unregisterDeviceToken!(token);
+      await LocalCache.instance.clearFcmToken();
+      debugPrint('FCM device token unregistered from backend');
+    } catch (e) {
+      debugPrint('FCM device token unregister failed: $e');
+    }
+  }
+
+  void _handleTokenRefresh(String token) {
+    LocalCache.instance.saveFcmToken(token);
+    // Best-effort re-register when logged in (callback only set while app wired).
+    syncDeviceTokenToServer();
+  }
+
   void _setLocalTimezone() {
-    // Approximate the device timezone from the current UTC offset. For an
-    // exact zone (DST-aware) bundle flutter_timezone; this is fine for the
-    // demo. Falls back to UTC if no match is found.
     try {
       final offset = DateTime.now().timeZoneOffset;
       for (final name in tz.timeZoneDatabase.locations.keys) {
@@ -104,17 +174,53 @@ class NotificationService {
 
   void _handleFcmForeground(RemoteMessage message) {
     final notif = message.notification;
+    final route = resolvePushDeepLink(message.data);
+    final isResults = (message.data['type']?.toString() ?? '')
+            .contains('lab') ||
+        route.startsWith('/results');
     showLocalNow(
-      title: notif?.title ?? 'وصلت نتيجة جديدة',
-      body: notif?.body ?? 'تحقق من نتائج التحاليل.',
-      payload: message.data['deepLink'] as String? ?? '/results',
-      results: true,
+      title: notif?.title ?? message.data['title']?.toString() ?? 'إشعار جديد',
+      body: notif?.body ??
+          message.data['body']?.toString() ??
+          'تحققوا من التطبيق للتفاصيل.',
+      payload: route,
+      results: isResults,
     );
+    onInboxRefresh?.call();
   }
 
   void _handleFcmOpened(RemoteMessage message) {
-    final link = message.data['deepLink'] as String?;
-    if (link != null) onDeepLink?.call(link);
+    final link = resolvePushDeepLink(message.data);
+    onDeepLink?.call(link);
+  }
+
+  /// Maps FCM data payload → in-app route.
+  static String resolvePushDeepLink(Map<String, dynamic> data) {
+    final explicit = data['deepLink'] ?? data['deep_link'];
+    if (explicit != null && explicit.toString().isNotEmpty) {
+      return explicit.toString();
+    }
+
+    final type = (data['type'] ?? '').toString().toLowerCase();
+    final ref = const FlexibleNullableStringConverter().fromJson(
+      data['referenceId'] ?? data['reference_id'] ?? data['relatedId'],
+    );
+
+    switch (type) {
+      case 'lab_result':
+      case 'resultarrived':
+      case 'result_arrived':
+        if (ref != null && ref.isNotEmpty) return '/results/$ref';
+        return '/results';
+      case 'appointment':
+        return '/appointments';
+      case 'dose':
+      case 'dosereminder':
+      case 'dose_reminder':
+        return '/appointments';
+      default:
+        return '/notifications';
+    }
   }
 
   // ---- Local: immediate ---------------------------------------------------
@@ -131,8 +237,14 @@ class NotificationService {
         results ? 'نتائج التحاليل' : _channelName,
         importance: Importance.high,
         priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
       ),
-      iOS: const DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
     );
     await _local.show(
       id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
@@ -145,23 +257,25 @@ class NotificationService {
 
   // ---- Local: scheduled dose reminders ------------------------------------
 
-  /// Reschedule dose reminders for [record]. Cancels existing reminders first,
-  /// then schedules a day-before and morning-of reminder for the next dose.
-  /// Respects [enabled] (the user's preference toggle).
   Future<void> rescheduleDoseReminders(
     PatientRecord record, {
     required bool enabled,
   }) async {
     await _cancelDoseReminders();
-    if (!enabled) return;
+    if (!enabled) {
+      debugPrint('Dose reminders disabled — cancelled local schedules');
+      return;
+    }
 
     final nextDose = record.nextDoseDate;
-    if (nextDose == null) return;
+    if (nextDose == null) {
+      debugPrint('No dose reminder date — cancelled local schedules');
+      return;
+    }
 
     final childName = record.child.firstName;
     final dateLabel = '${nextDose.day}/${nextDose.month}';
 
-    // Day-before, at 7pm.
     final dayBefore = DateTime(
       nextDose.year,
       nextDose.month,
@@ -176,7 +290,6 @@ class NotificationService {
       payload: '/appointments',
     );
 
-    // Morning-of, at 8am.
     final morningOf = DateTime(
       nextDose.year,
       nextDose.month,
@@ -190,6 +303,8 @@ class NotificationService {
       body: 'جرعة $childName اليوم. الفريق بانتظاركم 💙',
       payload: '/appointments',
     );
+
+    debugPrint('Dose reminders scheduled for $nextDose ($childName)');
   }
 
   static const int _doseBaseId = 9000;
@@ -207,7 +322,6 @@ class NotificationService {
     required String payload,
   }) async {
     final scheduled = tz.TZDateTime.from(when, tz.local);
-    // Don't schedule in the past.
     if (scheduled.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     await _local.zonedSchedule(

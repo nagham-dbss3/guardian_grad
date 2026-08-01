@@ -41,9 +41,8 @@ class _QrScreenState extends ConsumerState<QrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final record = ref.watch(activeRecordProvider);
-    final child = record.child;
-    final token = record.checkInToken;
+    final child = ref.watch(activeChildProvider);
+    final token = ref.watch(checkInTokenProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -109,7 +108,12 @@ class _QrScreenState extends ConsumerState<QrScreen> {
                   const SizedBox(height: 10),
                   if (token.bookingTime != null)
                     Text('وقت الحجز: ${DateFormatAr.time(token.bookingTime!)}',
-                        style: Theme.of(context).textTheme.titleMedium),
+                        style: Theme.of(context).textTheme.titleMedium)
+                  else
+                    Text(
+                      'وقت الإصدار: ${DateFormatAr.time(token.issueTime)}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                   Text(token.department,
                       style: const TextStyle(color: AppColors.mutedForeground)),
                 ] else

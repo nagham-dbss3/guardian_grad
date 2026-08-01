@@ -21,10 +21,13 @@ NotificationItem _$NotificationItemFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$NotificationItem {
+  @FlexibleStringConverter()
   String get id => throw _privateConstructorUsedError;
+  @JsonKey(unknownEnumValue: AppNotificationType.update)
   AppNotificationType get type => throw _privateConstructorUsedError;
   String get message => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
+  @FlexibleNullableStringConverter()
   String? get relatedId => throw _privateConstructorUsedError;
   bool get isRead => throw _privateConstructorUsedError;
   String? get deepLink => throw _privateConstructorUsedError;
@@ -47,11 +50,12 @@ abstract class $NotificationItemCopyWith<$Res> {
   ) = _$NotificationItemCopyWithImpl<$Res, NotificationItem>;
   @useResult
   $Res call({
-    String id,
+    @FlexibleStringConverter() String id,
+    @JsonKey(unknownEnumValue: AppNotificationType.update)
     AppNotificationType type,
     String message,
     DateTime timestamp,
-    String? relatedId,
+    @FlexibleNullableStringConverter() String? relatedId,
     bool isRead,
     String? deepLink,
   });
@@ -126,11 +130,12 @@ abstract class _$$NotificationItemImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
+    @FlexibleStringConverter() String id,
+    @JsonKey(unknownEnumValue: AppNotificationType.update)
     AppNotificationType type,
     String message,
     DateTime timestamp,
-    String? relatedId,
+    @FlexibleNullableStringConverter() String? relatedId,
     bool isRead,
     String? deepLink,
   });
@@ -195,29 +200,34 @@ class __$$NotificationItemImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$NotificationItemImpl implements _NotificationItem {
+class _$NotificationItemImpl extends _NotificationItem {
   const _$NotificationItemImpl({
-    required this.id,
-    required this.type,
-    required this.message,
+    @FlexibleStringConverter() required this.id,
+    @JsonKey(unknownEnumValue: AppNotificationType.update)
+    this.type = AppNotificationType.update,
+    this.message = '',
     required this.timestamp,
-    this.relatedId,
+    @FlexibleNullableStringConverter() this.relatedId,
     this.isRead = false,
     this.deepLink,
-  });
+  }) : super._();
 
   factory _$NotificationItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$NotificationItemImplFromJson(json);
 
   @override
+  @FlexibleStringConverter()
   final String id;
   @override
+  @JsonKey(unknownEnumValue: AppNotificationType.update)
   final AppNotificationType type;
   @override
+  @JsonKey()
   final String message;
   @override
   final DateTime timestamp;
   @override
+  @FlexibleNullableStringConverter()
   final String? relatedId;
   @override
   @JsonKey()
@@ -277,29 +287,34 @@ class _$NotificationItemImpl implements _NotificationItem {
   }
 }
 
-abstract class _NotificationItem implements NotificationItem {
+abstract class _NotificationItem extends NotificationItem {
   const factory _NotificationItem({
-    required final String id,
-    required final AppNotificationType type,
-    required final String message,
+    @FlexibleStringConverter() required final String id,
+    @JsonKey(unknownEnumValue: AppNotificationType.update)
+    final AppNotificationType type,
+    final String message,
     required final DateTime timestamp,
-    final String? relatedId,
+    @FlexibleNullableStringConverter() final String? relatedId,
     final bool isRead,
     final String? deepLink,
   }) = _$NotificationItemImpl;
+  const _NotificationItem._() : super._();
 
   factory _NotificationItem.fromJson(Map<String, dynamic> json) =
       _$NotificationItemImpl.fromJson;
 
   @override
+  @FlexibleStringConverter()
   String get id;
   @override
+  @JsonKey(unknownEnumValue: AppNotificationType.update)
   AppNotificationType get type;
   @override
   String get message;
   @override
   DateTime get timestamp;
   @override
+  @FlexibleNullableStringConverter()
   String? get relatedId;
   @override
   bool get isRead;
@@ -312,4 +327,184 @@ abstract class _NotificationItem implements NotificationItem {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$NotificationItemImplCopyWith<_$NotificationItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+NotificationsListResponse _$NotificationsListResponseFromJson(
+  Map<String, dynamic> json,
+) {
+  return _NotificationsListResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$NotificationsListResponse {
+  List<NotificationItem> get notifications =>
+      throw _privateConstructorUsedError;
+
+  /// Serializes this NotificationsListResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of NotificationsListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $NotificationsListResponseCopyWith<NotificationsListResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $NotificationsListResponseCopyWith<$Res> {
+  factory $NotificationsListResponseCopyWith(
+    NotificationsListResponse value,
+    $Res Function(NotificationsListResponse) then,
+  ) = _$NotificationsListResponseCopyWithImpl<$Res, NotificationsListResponse>;
+  @useResult
+  $Res call({List<NotificationItem> notifications});
+}
+
+/// @nodoc
+class _$NotificationsListResponseCopyWithImpl<
+  $Res,
+  $Val extends NotificationsListResponse
+>
+    implements $NotificationsListResponseCopyWith<$Res> {
+  _$NotificationsListResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of NotificationsListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? notifications = null}) {
+    return _then(
+      _value.copyWith(
+            notifications: null == notifications
+                ? _value.notifications
+                : notifications // ignore: cast_nullable_to_non_nullable
+                      as List<NotificationItem>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$NotificationsListResponseImplCopyWith<$Res>
+    implements $NotificationsListResponseCopyWith<$Res> {
+  factory _$$NotificationsListResponseImplCopyWith(
+    _$NotificationsListResponseImpl value,
+    $Res Function(_$NotificationsListResponseImpl) then,
+  ) = __$$NotificationsListResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<NotificationItem> notifications});
+}
+
+/// @nodoc
+class __$$NotificationsListResponseImplCopyWithImpl<$Res>
+    extends
+        _$NotificationsListResponseCopyWithImpl<
+          $Res,
+          _$NotificationsListResponseImpl
+        >
+    implements _$$NotificationsListResponseImplCopyWith<$Res> {
+  __$$NotificationsListResponseImplCopyWithImpl(
+    _$NotificationsListResponseImpl _value,
+    $Res Function(_$NotificationsListResponseImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of NotificationsListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? notifications = null}) {
+    return _then(
+      _$NotificationsListResponseImpl(
+        notifications: null == notifications
+            ? _value._notifications
+            : notifications // ignore: cast_nullable_to_non_nullable
+                  as List<NotificationItem>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$NotificationsListResponseImpl implements _NotificationsListResponse {
+  const _$NotificationsListResponseImpl({
+    final List<NotificationItem> notifications = const <NotificationItem>[],
+  }) : _notifications = notifications;
+
+  factory _$NotificationsListResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$NotificationsListResponseImplFromJson(json);
+
+  final List<NotificationItem> _notifications;
+  @override
+  @JsonKey()
+  List<NotificationItem> get notifications {
+    if (_notifications is EqualUnmodifiableListView) return _notifications;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_notifications);
+  }
+
+  @override
+  String toString() {
+    return 'NotificationsListResponse(notifications: $notifications)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$NotificationsListResponseImpl &&
+            const DeepCollectionEquality().equals(
+              other._notifications,
+              _notifications,
+            ));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+    runtimeType,
+    const DeepCollectionEquality().hash(_notifications),
+  );
+
+  /// Create a copy of NotificationsListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$NotificationsListResponseImplCopyWith<_$NotificationsListResponseImpl>
+  get copyWith =>
+      __$$NotificationsListResponseImplCopyWithImpl<
+        _$NotificationsListResponseImpl
+      >(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$NotificationsListResponseImplToJson(this);
+  }
+}
+
+abstract class _NotificationsListResponse implements NotificationsListResponse {
+  const factory _NotificationsListResponse({
+    final List<NotificationItem> notifications,
+  }) = _$NotificationsListResponseImpl;
+
+  factory _NotificationsListResponse.fromJson(Map<String, dynamic> json) =
+      _$NotificationsListResponseImpl.fromJson;
+
+  @override
+  List<NotificationItem> get notifications;
+
+  /// Create a copy of NotificationsListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$NotificationsListResponseImplCopyWith<_$NotificationsListResponseImpl>
+  get copyWith => throw _privateConstructorUsedError;
 }

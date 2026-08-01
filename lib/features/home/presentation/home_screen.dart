@@ -29,10 +29,15 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(guardianControllerProvider);
     final record = state.record;
-    final child = record.child;
+    final child = ref.watch(activeChildProvider);
+    final checkInToken = ref.watch(checkInTokenProvider);
 
     return RefreshIndicator(
-      onRefresh: () async => ref.read(guardianControllerProvider.notifier).refresh(),
+      onRefresh: () async {
+        await ref
+            .read(guardianControllerProvider.notifier)
+            .syncActiveClinical();
+      },
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
@@ -63,7 +68,7 @@ class HomeScreen extends ConsumerWidget {
           // Check-in hero
           CheckInCard(
             fileNo: child.fileNoBasma,
-            token: record.checkInToken,
+            token: checkInToken,
             onTap: () => context.push('/qr'),
           ),
           const SizedBox(height: 16),
@@ -252,6 +257,8 @@ class _QuickGrid extends StatelessWidget {
           Color(0xFF9A7B11), AppColors.highlightSoft, '/discharge'),
       const _QuickItem('المواعيد', Icons.event_rounded, AppColors.primary,
           AppColors.primarySoft, '/appointments'),
+      const _QuickItem('طوابير الانتظار', Icons.queue_rounded, AppColors.secondary,
+          AppColors.secondarySoft, '/queues'),
       const _QuickItem('الملف الشخصي', Icons.person_rounded, AppColors.accent,
           AppColors.accentSoft, '/profile'),
     ];
@@ -327,7 +334,7 @@ class _LatestUpdates extends StatelessWidget {
             child: AppCard(
               padding: const EdgeInsets.all(12),
               onTap: () {
-                if (n.deepLink != null) context.push(n.deepLink!);
+                context.push(n.route);
               },
               child: Row(
                 children: [
@@ -337,7 +344,7 @@ class _LatestUpdates extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(n.message,
+                        Text(n.displayText,
                             maxLines: 2, overflow: TextOverflow.ellipsis),
                         const SizedBox(height: 2),
                         Text(DateFormatAr.relativeDay(n.timestamp),
@@ -367,32 +374,14 @@ class _SupportiveFooter extends StatelessWidget {
         gradient: AppGradients.sun,
         borderRadius: BorderRadius.circular(AppRadii.xl2),
       ),
-      child: Column(
-        children: [
-          const Text(
-            'نحن معكم، وكل يوم خطوة نحو الأفضل 🌻',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color(0xFF5A4708),
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-            ),
-          ),
-          const SizedBox(height: 12),
-          FilledButton.tonalIcon(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF9A7B11),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('سيتم تحويلكم للتواصل مع الوحدة')),
-              );
-            },
-            icon: const Icon(Icons.headset_mic_rounded),
-            label: const Text('تواصل مع الوحدة'),
-          ),
-        ],
+      child: const Text(
+        'نحن معكم، وكل يوم خطوة نحو الأفضل 🌻',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Color(0xFF5A4708),
+          fontWeight: FontWeight.w700,
+          fontSize: 15,
+        ),
       ),
     );
   }

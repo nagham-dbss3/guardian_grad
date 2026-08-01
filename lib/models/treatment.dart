@@ -16,6 +16,7 @@ enum StageStatus {
 class StageView with _$StageView {
   const factory StageView({
     required String name,
+    @JsonKey(unknownEnumValue: StageStatus.upcoming)
     required StageStatus status,
     DateTime? startDate,
     DateTime? endDate,
@@ -27,13 +28,18 @@ class StageView with _$StageView {
       _$StageViewFromJson(json);
 }
 
+/// Treatment journey plan as returned by
+/// `GET /guardian/children/{fileNo}/treatment-journey`.
 @freezed
 class TreatmentPlanView with _$TreatmentPlanView {
   const factory TreatmentPlanView({
-    required String planName,
+    @Default('') String planName,
     @Default(<StageView>[]) List<StageView> stages,
   }) = _TreatmentPlanView;
 
   factory TreatmentPlanView.fromJson(Map<String, dynamic> json) =>
       _$TreatmentPlanViewFromJson(json);
 }
+
+/// Alias matching the API naming in product docs.
+typedef TreatmentJourneyModel = TreatmentPlanView;

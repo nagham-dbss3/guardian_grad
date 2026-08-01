@@ -3,12 +3,13 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.basma.basma_patient"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "29.0.13599879"
 
     compileOptions {
         // Required by flutter_local_notifications for time-zone scheduling.
@@ -25,7 +26,7 @@ android {
 
     defaultConfig {
         applicationId = "com.basma.basma_patient"
-        // firebase_messaging and local_auth need a modern min SDK.
+        // firebase_messaging needs a modern min SDK.
         minSdk = maxOf(23, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

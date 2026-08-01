@@ -1,6 +1,5 @@
 package com.basma.basma_patient
 
-import io.flutter.embedding.android.FlutterFragmentActivity
+import io.flutter.embedding.android.FlutterActivity
 
-// FlutterFragmentActivity is required by local_auth for biometric prompts.
-class MainActivity : FlutterFragmentActivity()
+class MainActivity : FlutterActivity()

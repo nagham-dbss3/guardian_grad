@@ -1,10 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../core/utils/json_converters.dart';
+
 part 'child.freezed.dart';
 part 'child.g.dart';
 
 /// Read-only, masked, least-privilege view of a child.
 /// No life-status / mortality / death-follow-up fields by design.
+/// JSON keys match the camelCase `/guardian/*` API contract.
 @freezed
 class ChildSummary with _$ChildSummary {
   const factory ChildSummary({
@@ -27,10 +30,11 @@ class ChildSummary with _$ChildSummary {
   String get fullName => '$firstName $familyName';
 }
 
+/// Guardian profile as returned by `GET /guardian/me`.
 @freezed
 class GuardianProfile with _$GuardianProfile {
   const factory GuardianProfile({
-    required String id,
+    @FlexibleStringConverter() required String id,
     required String name,
     required String relationshipToChild,
     String? contactPhone,
@@ -40,6 +44,17 @@ class GuardianProfile with _$GuardianProfile {
 
   factory GuardianProfile.fromJson(Map<String, dynamic> json) =>
       _$GuardianProfileFromJson(json);
+}
+
+/// Wrapper for `GET /guardian/children`.
+@freezed
+class ChildrenListResponse with _$ChildrenListResponse {
+  const factory ChildrenListResponse({
+    @Default(<ChildSummary>[]) List<ChildSummary> children,
+  }) = _ChildrenListResponse;
+
+  factory ChildrenListResponse.fromJson(Map<String, dynamic> json) =>
+      _$ChildrenListResponseFromJson(json);
 }
 
 /// Gentle, parent-friendly summary — not the clinical documentation template.

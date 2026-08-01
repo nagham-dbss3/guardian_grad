@@ -367,6 +367,7 @@ GuardianProfile _$GuardianProfileFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$GuardianProfile {
+  @FlexibleStringConverter()
   String get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get relationshipToChild => throw _privateConstructorUsedError;
@@ -392,7 +393,7 @@ abstract class $GuardianProfileCopyWith<$Res> {
   ) = _$GuardianProfileCopyWithImpl<$Res, GuardianProfile>;
   @useResult
   $Res call({
-    String id,
+    @FlexibleStringConverter() String id,
     String name,
     String relationshipToChild,
     String? contactPhone,
@@ -465,7 +466,7 @@ abstract class _$$GuardianProfileImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String id,
+    @FlexibleStringConverter() String id,
     String name,
     String relationshipToChild,
     String? contactPhone,
@@ -530,7 +531,7 @@ class __$$GuardianProfileImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$GuardianProfileImpl implements _GuardianProfile {
   const _$GuardianProfileImpl({
-    required this.id,
+    @FlexibleStringConverter() required this.id,
     required this.name,
     required this.relationshipToChild,
     this.contactPhone,
@@ -542,6 +543,7 @@ class _$GuardianProfileImpl implements _GuardianProfile {
       _$$GuardianProfileImplFromJson(json);
 
   @override
+  @FlexibleStringConverter()
   final String id;
   @override
   final String name;
@@ -612,7 +614,7 @@ class _$GuardianProfileImpl implements _GuardianProfile {
 
 abstract class _GuardianProfile implements GuardianProfile {
   const factory _GuardianProfile({
-    required final String id,
+    @FlexibleStringConverter() required final String id,
     required final String name,
     required final String relationshipToChild,
     final String? contactPhone,
@@ -624,6 +626,7 @@ abstract class _GuardianProfile implements GuardianProfile {
       _$GuardianProfileImpl.fromJson;
 
   @override
+  @FlexibleStringConverter()
   String get id;
   @override
   String get name;
@@ -642,6 +645,174 @@ abstract class _GuardianProfile implements GuardianProfile {
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$GuardianProfileImplCopyWith<_$GuardianProfileImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+ChildrenListResponse _$ChildrenListResponseFromJson(Map<String, dynamic> json) {
+  return _ChildrenListResponse.fromJson(json);
+}
+
+/// @nodoc
+mixin _$ChildrenListResponse {
+  List<ChildSummary> get children => throw _privateConstructorUsedError;
+
+  /// Serializes this ChildrenListResponse to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of ChildrenListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $ChildrenListResponseCopyWith<ChildrenListResponse> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $ChildrenListResponseCopyWith<$Res> {
+  factory $ChildrenListResponseCopyWith(
+    ChildrenListResponse value,
+    $Res Function(ChildrenListResponse) then,
+  ) = _$ChildrenListResponseCopyWithImpl<$Res, ChildrenListResponse>;
+  @useResult
+  $Res call({List<ChildSummary> children});
+}
+
+/// @nodoc
+class _$ChildrenListResponseCopyWithImpl<
+  $Res,
+  $Val extends ChildrenListResponse
+>
+    implements $ChildrenListResponseCopyWith<$Res> {
+  _$ChildrenListResponseCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of ChildrenListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? children = null}) {
+    return _then(
+      _value.copyWith(
+            children: null == children
+                ? _value.children
+                : children // ignore: cast_nullable_to_non_nullable
+                      as List<ChildSummary>,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$ChildrenListResponseImplCopyWith<$Res>
+    implements $ChildrenListResponseCopyWith<$Res> {
+  factory _$$ChildrenListResponseImplCopyWith(
+    _$ChildrenListResponseImpl value,
+    $Res Function(_$ChildrenListResponseImpl) then,
+  ) = __$$ChildrenListResponseImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({List<ChildSummary> children});
+}
+
+/// @nodoc
+class __$$ChildrenListResponseImplCopyWithImpl<$Res>
+    extends _$ChildrenListResponseCopyWithImpl<$Res, _$ChildrenListResponseImpl>
+    implements _$$ChildrenListResponseImplCopyWith<$Res> {
+  __$$ChildrenListResponseImplCopyWithImpl(
+    _$ChildrenListResponseImpl _value,
+    $Res Function(_$ChildrenListResponseImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of ChildrenListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? children = null}) {
+    return _then(
+      _$ChildrenListResponseImpl(
+        children: null == children
+            ? _value._children
+            : children // ignore: cast_nullable_to_non_nullable
+                  as List<ChildSummary>,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$ChildrenListResponseImpl implements _ChildrenListResponse {
+  const _$ChildrenListResponseImpl({
+    final List<ChildSummary> children = const <ChildSummary>[],
+  }) : _children = children;
+
+  factory _$ChildrenListResponseImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ChildrenListResponseImplFromJson(json);
+
+  final List<ChildSummary> _children;
+  @override
+  @JsonKey()
+  List<ChildSummary> get children {
+    if (_children is EqualUnmodifiableListView) return _children;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_children);
+  }
+
+  @override
+  String toString() {
+    return 'ChildrenListResponse(children: $children)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$ChildrenListResponseImpl &&
+            const DeepCollectionEquality().equals(other._children, _children));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_children));
+
+  /// Create a copy of ChildrenListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$ChildrenListResponseImplCopyWith<_$ChildrenListResponseImpl>
+  get copyWith =>
+      __$$ChildrenListResponseImplCopyWithImpl<_$ChildrenListResponseImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$ChildrenListResponseImplToJson(this);
+  }
+}
+
+abstract class _ChildrenListResponse implements ChildrenListResponse {
+  const factory _ChildrenListResponse({final List<ChildSummary> children}) =
+      _$ChildrenListResponseImpl;
+
+  factory _ChildrenListResponse.fromJson(Map<String, dynamic> json) =
+      _$ChildrenListResponseImpl.fromJson;
+
+  @override
+  List<ChildSummary> get children;
+
+  /// Create a copy of ChildrenListResponse
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$ChildrenListResponseImplCopyWith<_$ChildrenListResponseImpl>
+  get copyWith => throw _privateConstructorUsedError;
 }
 
 DiseaseOverview _$DiseaseOverviewFromJson(Map<String, dynamic> json) {

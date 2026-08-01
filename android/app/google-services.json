@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "108684870050",
+    "project_id": "basma-reception-notifications",
+    "storage_bucket": "basma-reception-notifications.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:108684870050:android:74499d3b12af2dcebeb2fb",
+        "android_client_info": {
+          "package_name": "com.basma.basma_patient"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOcYjr78SGPzdMU1-bN2E2ACxdbG6bG-M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

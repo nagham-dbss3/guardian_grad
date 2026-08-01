@@ -1,36 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/services/pdf_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/gradients.dart';
 import '../../../core/theme/radii.dart';
 import '../../../core/utils/date_format_ar.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/empty_state.dart';
-import '../../../core/widgets/primary_button.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../models/clinical.dart';
 import '../../shared/data/guardian_providers.dart';
 
-class DischargeDetailScreen extends ConsumerStatefulWidget {
+class DischargeDetailScreen extends ConsumerWidget {
   const DischargeDetailScreen({super.key, required this.reportId});
   final String reportId;
 
   @override
-  ConsumerState<DischargeDetailScreen> createState() =>
-      _DischargeDetailScreenState();
-}
-
-class _DischargeDetailScreenState
-    extends ConsumerState<DischargeDetailScreen> {
-  bool _sharing = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final record = ref.watch(activeRecordProvider);
     final matches = record.dischargeReports
-        .where((r) => r.id == widget.reportId)
+        .where((r) => r.id == reportId)
         .toList();
     final report = matches.isEmpty ? null : matches.first;
 
@@ -41,7 +30,6 @@ class _DischargeDetailScreenState
           : ListView(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
               children: [
-                // What's next — supportive framing
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
@@ -66,7 +54,8 @@ class _DischargeDetailScreenState
                       const SizedBox(height: 10),
                       Text(
                         'الجرعة القادمة: ${DateFormatAr.dayDate(report.nextDoseDate)}',
-                        style: const TextStyle(color: Colors.white, height: 1.6),
+                        style:
+                            const TextStyle(color: Colors.white, height: 1.6),
                       ),
                       Text('الوجهة القادمة: ${report.nextVisitDepartment}',
                           style: const TextStyle(color: Colors.white)),
@@ -74,7 +63,6 @@ class _DischargeDetailScreenState
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 AppCard(
                   child: Column(
                     children: [
@@ -89,7 +77,6 @@ class _DischargeDetailScreenState
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 const SectionHeader(
                     title: 'الوصفة', icon: Icons.medication_rounded),
                 const SizedBox(height: 12),
@@ -104,7 +91,6 @@ class _DischargeDetailScreenState
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 const SectionHeader(
                     title: 'تعليمات الطبيب', icon: Icons.notes_rounded),
                 const SizedBox(height: 12),
@@ -112,33 +98,9 @@ class _DischargeDetailScreenState
                   child: Text(report.doctorInstructions,
                       style: const TextStyle(height: 1.7)),
                 ),
-                const SizedBox(height: 20),
-
-                if (report.exportable)
-                  PrimaryButton(
-                    label: 'تصدير / مشاركة التقرير',
-                    icon: Icons.ios_share_rounded,
-                    loading: _sharing,
-                    onPressed: () => _share(report, record.child.fullName),
-                  ),
               ],
             ),
     );
-  }
-
-  Future<void> _share(DischargeReportView report, String childName) async {
-    setState(() => _sharing = true);
-    try {
-      await PdfService.instance.shareDischarge(report, childName);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('تعذّر إنشاء الملف: $e')),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _sharing = false);
-    }
   }
 
   Widget _row(String label, String value) => Row(

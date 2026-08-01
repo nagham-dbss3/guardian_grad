@@ -9,7 +9,11 @@ part of 'treatment.dart';
 _$StageViewImpl _$$StageViewImplFromJson(Map<String, dynamic> json) =>
     _$StageViewImpl(
       name: json['name'] as String,
-      status: $enumDecode(_$StageStatusEnumMap, json['status']),
+      status: $enumDecode(
+        _$StageStatusEnumMap,
+        json['status'],
+        unknownValue: StageStatus.upcoming,
+      ),
       startDate: json['startDate'] == null
           ? null
           : DateTime.parse(json['startDate'] as String),
@@ -39,7 +43,7 @@ const _$StageStatusEnumMap = {
 _$TreatmentPlanViewImpl _$$TreatmentPlanViewImplFromJson(
   Map<String, dynamic> json,
 ) => _$TreatmentPlanViewImpl(
-  planName: json['planName'] as String,
+  planName: json['planName'] as String? ?? '',
   stages:
       (json['stages'] as List<dynamic>?)
           ?.map((e) => StageView.fromJson(e as Map<String, dynamic>))
@@ -51,5 +55,5 @@ Map<String, dynamic> _$$TreatmentPlanViewImplToJson(
   _$TreatmentPlanViewImpl instance,
 ) => <String, dynamic>{
   'planName': instance.planName,
-  'stages': instance.stages,
+  'stages': instance.stages.map((e) => e.toJson()).toList(),
 };

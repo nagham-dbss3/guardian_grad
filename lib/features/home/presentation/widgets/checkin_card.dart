@@ -80,7 +80,11 @@ class CheckInCard extends StatelessWidget {
                     _pill('رقم الدور: ${token!.number}'),
                     const SizedBox(height: 6),
                     if (token!.bookingTime != null)
-                      _pill('وقت الحجز: ${DateFormatAr.time(token!.bookingTime!)}'),
+                      _pill(
+                          'وقت الحجز: ${DateFormatAr.time(token!.bookingTime!)}')
+                    else
+                      _pill(
+                          'وقت الإصدار: ${DateFormatAr.time(token!.issueTime)}'),
                   ] else
                     _pill('لا يوجد دور صادر اليوم'),
                   const SizedBox(height: 10),

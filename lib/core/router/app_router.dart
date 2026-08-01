@@ -7,6 +7,7 @@ import '../../features/checkin_qr/presentation/qr_screen.dart';
 import '../../features/child_record/presentation/record_screen.dart';
 import '../../features/discharge_reports/presentation/discharge_detail_screen.dart';
 import '../../features/discharge_reports/presentation/discharge_screen.dart';
+import '../../features/display_queues/presentation/queues_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/lab_results/presentation/result_detail_screen.dart';
 import '../../features/lab_results/presentation/results_screen.dart';
@@ -72,6 +73,11 @@ GoRouter createRouter() {
         path: '/qr',
         parentNavigatorKey: _rootKey,
         builder: (context, state) => const QrScreen(),
+      ),
+      GoRoute(
+        path: '/queues',
+        parentNavigatorKey: _rootKey,
+        builder: (context, state) => const QueuesScreen(),
       ),
       GoRoute(
         path: '/journey',

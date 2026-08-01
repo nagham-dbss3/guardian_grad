@@ -28,6 +28,7 @@ mixin _$PatientRecord {
   List<DischargeReportView> get dischargeReports =>
       throw _privateConstructorUsedError;
   List<AppointmentView> get appointments => throw _privateConstructorUsedError;
+  DoseReminderModel? get doseReminder => throw _privateConstructorUsedError;
   CheckInToken? get checkInToken => throw _privateConstructorUsedError;
   DateTime get lastUpdated => throw _privateConstructorUsedError;
 
@@ -55,6 +56,7 @@ abstract class $PatientRecordCopyWith<$Res> {
     List<LabResultView> labResults,
     List<DischargeReportView> dischargeReports,
     List<AppointmentView> appointments,
+    DoseReminderModel? doseReminder,
     CheckInToken? checkInToken,
     DateTime lastUpdated,
   });
@@ -62,6 +64,7 @@ abstract class $PatientRecordCopyWith<$Res> {
   $ChildSummaryCopyWith<$Res> get child;
   $DiseaseOverviewCopyWith<$Res> get diseaseOverview;
   $TreatmentPlanViewCopyWith<$Res> get treatmentPlan;
+  $DoseReminderModelCopyWith<$Res>? get doseReminder;
   $CheckInTokenCopyWith<$Res>? get checkInToken;
 }
 
@@ -86,6 +89,7 @@ class _$PatientRecordCopyWithImpl<$Res, $Val extends PatientRecord>
     Object? labResults = null,
     Object? dischargeReports = null,
     Object? appointments = null,
+    Object? doseReminder = freezed,
     Object? checkInToken = freezed,
     Object? lastUpdated = null,
   }) {
@@ -115,6 +119,10 @@ class _$PatientRecordCopyWithImpl<$Res, $Val extends PatientRecord>
                 ? _value.appointments
                 : appointments // ignore: cast_nullable_to_non_nullable
                       as List<AppointmentView>,
+            doseReminder: freezed == doseReminder
+                ? _value.doseReminder
+                : doseReminder // ignore: cast_nullable_to_non_nullable
+                      as DoseReminderModel?,
             checkInToken: freezed == checkInToken
                 ? _value.checkInToken
                 : checkInToken // ignore: cast_nullable_to_non_nullable
@@ -162,6 +170,20 @@ class _$PatientRecordCopyWithImpl<$Res, $Val extends PatientRecord>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
+  $DoseReminderModelCopyWith<$Res>? get doseReminder {
+    if (_value.doseReminder == null) {
+      return null;
+    }
+
+    return $DoseReminderModelCopyWith<$Res>(_value.doseReminder!, (value) {
+      return _then(_value.copyWith(doseReminder: value) as $Val);
+    });
+  }
+
+  /// Create a copy of PatientRecord
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
   $CheckInTokenCopyWith<$Res>? get checkInToken {
     if (_value.checkInToken == null) {
       return null;
@@ -189,6 +211,7 @@ abstract class _$$PatientRecordImplCopyWith<$Res>
     List<LabResultView> labResults,
     List<DischargeReportView> dischargeReports,
     List<AppointmentView> appointments,
+    DoseReminderModel? doseReminder,
     CheckInToken? checkInToken,
     DateTime lastUpdated,
   });
@@ -199,6 +222,8 @@ abstract class _$$PatientRecordImplCopyWith<$Res>
   $DiseaseOverviewCopyWith<$Res> get diseaseOverview;
   @override
   $TreatmentPlanViewCopyWith<$Res> get treatmentPlan;
+  @override
+  $DoseReminderModelCopyWith<$Res>? get doseReminder;
   @override
   $CheckInTokenCopyWith<$Res>? get checkInToken;
 }
@@ -223,6 +248,7 @@ class __$$PatientRecordImplCopyWithImpl<$Res>
     Object? labResults = null,
     Object? dischargeReports = null,
     Object? appointments = null,
+    Object? doseReminder = freezed,
     Object? checkInToken = freezed,
     Object? lastUpdated = null,
   }) {
@@ -252,6 +278,10 @@ class __$$PatientRecordImplCopyWithImpl<$Res>
             ? _value._appointments
             : appointments // ignore: cast_nullable_to_non_nullable
                   as List<AppointmentView>,
+        doseReminder: freezed == doseReminder
+            ? _value.doseReminder
+            : doseReminder // ignore: cast_nullable_to_non_nullable
+                  as DoseReminderModel?,
         checkInToken: freezed == checkInToken
             ? _value.checkInToken
             : checkInToken // ignore: cast_nullable_to_non_nullable
@@ -276,6 +306,7 @@ class _$PatientRecordImpl extends _PatientRecord {
     final List<DischargeReportView> dischargeReports =
         const <DischargeReportView>[],
     final List<AppointmentView> appointments = const <AppointmentView>[],
+    this.doseReminder,
     this.checkInToken,
     required this.lastUpdated,
   }) : _labResults = labResults,
@@ -321,13 +352,15 @@ class _$PatientRecordImpl extends _PatientRecord {
   }
 
   @override
+  final DoseReminderModel? doseReminder;
+  @override
   final CheckInToken? checkInToken;
   @override
   final DateTime lastUpdated;
 
   @override
   String toString() {
-    return 'PatientRecord(child: $child, diseaseOverview: $diseaseOverview, treatmentPlan: $treatmentPlan, labResults: $labResults, dischargeReports: $dischargeReports, appointments: $appointments, checkInToken: $checkInToken, lastUpdated: $lastUpdated)';
+    return 'PatientRecord(child: $child, diseaseOverview: $diseaseOverview, treatmentPlan: $treatmentPlan, labResults: $labResults, dischargeReports: $dischargeReports, appointments: $appointments, doseReminder: $doseReminder, checkInToken: $checkInToken, lastUpdated: $lastUpdated)';
   }
 
   @override
@@ -352,6 +385,8 @@ class _$PatientRecordImpl extends _PatientRecord {
               other._appointments,
               _appointments,
             ) &&
+            (identical(other.doseReminder, doseReminder) ||
+                other.doseReminder == doseReminder) &&
             (identical(other.checkInToken, checkInToken) ||
                 other.checkInToken == checkInToken) &&
             (identical(other.lastUpdated, lastUpdated) ||
@@ -368,6 +403,7 @@ class _$PatientRecordImpl extends _PatientRecord {
     const DeepCollectionEquality().hash(_labResults),
     const DeepCollectionEquality().hash(_dischargeReports),
     const DeepCollectionEquality().hash(_appointments),
+    doseReminder,
     checkInToken,
     lastUpdated,
   );
@@ -394,6 +430,7 @@ abstract class _PatientRecord extends PatientRecord {
     final List<LabResultView> labResults,
     final List<DischargeReportView> dischargeReports,
     final List<AppointmentView> appointments,
+    final DoseReminderModel? doseReminder,
     final CheckInToken? checkInToken,
     required final DateTime lastUpdated,
   }) = _$PatientRecordImpl;
@@ -414,6 +451,8 @@ abstract class _PatientRecord extends PatientRecord {
   List<DischargeReportView> get dischargeReports;
   @override
   List<AppointmentView> get appointments;
+  @override
+  DoseReminderModel? get doseReminder;
   @override
   CheckInToken? get checkInToken;
   @override
