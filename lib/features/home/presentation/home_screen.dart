@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -132,13 +134,76 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-class _NextDoseCard extends StatelessWidget {
+/// Home next-dose card: picks the earliest future dose and refreshes when it
+/// expires so the following dose (or empty state) appears automatically.
+class _NextDoseCard extends StatefulWidget {
   const _NextDoseCard({required this.record});
   final PatientRecord record;
 
   @override
+  State<_NextDoseCard> createState() => _NextDoseCardState();
+}
+
+class _NextDoseCardState extends State<_NextDoseCard> {
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleRefresh();
+  }
+
+  @override
+  void didUpdateWidget(covariant _NextDoseCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.record != widget.record) {
+      _scheduleRefresh();
+    }
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  DateTime? get _nextDose => widget.record.upcomingDoseDate();
+
+  void _scheduleRefresh() {
+    _refreshTimer?.cancel();
+    final next = _nextDose;
+    if (next == null) return;
+
+    final now = DateTime.now();
+    final untilExpiry = next.difference(now);
+    // Tick often enough for "خلال X ساعات" copy, and exactly when the dose
+    // becomes past so we advance to the following upcoming dose.
+    Duration delay;
+    if (untilExpiry.inSeconds <= 0) {
+      delay = const Duration(seconds: 1);
+    } else if (untilExpiry.inHours < 1) {
+      delay = const Duration(seconds: 30);
+    } else if (untilExpiry.inHours < 24) {
+      delay = const Duration(minutes: 1);
+    } else {
+      delay = const Duration(minutes: 5);
+    }
+
+    // Also wake up right when this dose expires (capped by the tick above).
+    if (untilExpiry > Duration.zero && untilExpiry < delay) {
+      delay = untilExpiry + const Duration(milliseconds: 200);
+    }
+
+    _refreshTimer = Timer(delay, () {
+      if (!mounted) return;
+      setState(() {});
+      _scheduleRefresh();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final next = record.nextDoseDate;
+    final next = _nextDose;
     return AppCard(
       onTap: () => context.push('/appointments'),
       child: Row(
@@ -163,26 +228,35 @@ class _NextDoseCard extends StatelessWidget {
                       fontSize: 13,
                     )),
                 const SizedBox(height: 4),
-                if (next != null)
+                if (next != null) ...[
                   Text(
-                    'جرعة ${record.child.firstName}: '
-                    '${DateFormatAr.relativeDay(next)}'
-                    '${_isFuture(next) ? '، ${DateFormatAr.time(next)}' : ''}',
+                    'جرعة ${widget.record.child.firstName}: '
+                    '${DateFormatAr.remainingUntil(next)}، '
+                    '${DateFormatAr.time(next)}',
                     style: Theme.of(context).textTheme.titleMedium,
-                  )
-                else
-                  const Text('لا توجد جرعة مجدولة حاليًا',
-                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    DateFormatAr.dayDate(next),
+                    style: const TextStyle(
+                      color: AppColors.mutedForeground,
+                      fontSize: 12,
+                    ),
+                  ),
+                ] else
+                  const Text(
+                    'لا توجد جرعات قادمة حالياً',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
               ],
             ),
           ),
-          const Icon(Icons.chevron_left_rounded, color: AppColors.mutedForeground),
+          const Icon(Icons.chevron_left_rounded,
+              color: AppColors.mutedForeground),
         ],
       ),
     );
   }
-
-  bool _isFuture(DateTime d) => d.isAfter(DateTime.now());
 }
 
 class _JourneyStrip extends StatelessWidget {

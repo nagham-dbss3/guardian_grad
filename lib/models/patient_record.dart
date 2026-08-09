@@ -38,12 +38,39 @@ class PatientRecord with _$PatientRecord {
     return sorted.first;
   }
 
-  /// Prefer dedicated dose-reminder API, else latest discharge next dose.
-  DateTime? get nextDoseDate =>
-      doseReminder?.nextDoseDate ?? latestDischarge?.nextDoseDate;
+  /// All known dose timestamps from reminder, discharges, and dose appointments.
+  List<DateTime> get allDoseDates {
+    final dates = <DateTime>[];
+    final reminder = doseReminder?.nextDoseDate;
+    if (reminder != null) dates.add(reminder);
+    for (final report in dischargeReports) {
+      dates.add(report.nextDoseDate);
+    }
+    for (final appt in appointments) {
+      if (appt.isNextDose) dates.add(appt.dateTime);
+    }
+    return dates;
+  }
+
+  /// Next upcoming dose: datetime >= [now], earliest first.
+  /// Past doses are excluded so the card can advance to the following one.
+  DateTime? upcomingDoseDate({DateTime? now}) {
+    final reference = now ?? DateTime.now();
+    final upcoming = allDoseDates
+        .where((d) => !d.isBefore(reference))
+        .toList()
+      ..sort();
+    return upcoming.isEmpty ? null : upcoming.first;
+  }
+
+  /// Resolved next dose date for UI / notifications (future-only).
+  DateTime? get nextDoseDate => upcomingDoseDate();
 
   AppointmentView? get nextAppointment {
-    final upcoming = appointments.toList()
+    final now = DateTime.now();
+    final upcoming = appointments
+        .where((a) => !a.dateTime.isBefore(now))
+        .toList()
       ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
     return upcoming.isEmpty ? null : upcoming.first;
   }

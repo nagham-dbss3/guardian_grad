@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/gradients.dart';
-import '../../../core/theme/radii.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../shared/data/guardian_providers.dart';
 import '../data/auth_providers.dart';
@@ -23,6 +21,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _loading = false;
   bool _obscure = true;
   String? _formError;
+  String? _userServerError;
+  String? _passServerError;
 
   @override
   void dispose() {
@@ -38,6 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   String? _validateUser(String? value) {
+    if (_userServerError != null) return _userServerError;
     final input = (value ?? '').trim();
     if (input.isEmpty) {
       return 'البريد الإلكتروني غير صحيح';
@@ -50,9 +51,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       return null;
     }
     // Email: must include @ and a domain with a dot (e.g. .com).
-    final emailOk = RegExp(
-      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
-    ).hasMatch(input);
+    final emailOk = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(input);
     if (!emailOk) {
       return 'البريد الإلكتروني غير صحيح';
     }
@@ -60,14 +59,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   String? _validatePassword(String? value) {
+    if (_passServerError != null) return _passServerError;
     if ((value ?? '').isEmpty) {
       return 'كلمة السر غير صحيحة';
     }
     return null;
   }
 
+  void _clearServerErrors() {
+    _formError = null;
+    _userServerError = null;
+    _passServerError = null;
+  }
+
+  /// Attach API credential failures to the matching field when possible.
+  void _applyAuthFailure(String message) {
+    _clearServerErrors();
+    if (message.contains('البريد') || message.contains('الهاتف')) {
+      _userServerError = message;
+      return;
+    }
+    if (message.contains('كلمة السر') || message.contains('كلمة المرور')) {
+      _passServerError = message;
+      return;
+    }
+    // Backend does not distinguish wrong email vs wrong password.
+    _formError = message;
+  }
+
   Future<void> _login() async {
-    setState(() => _formError = null);
+    setState(_clearServerErrors);
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     setState(() => _loading = true);
@@ -84,17 +105,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } else {
       setState(() {
         _loading = false;
-        _formError = auth.isLockedOut
-            ? 'تم إيقاف الدخول مؤقتًا. حاولوا لاحقًا.'
-            : (auth.lastError ??
-                'بيانات غير صحيحة. المحاولات المتبقية: ${auth.remainingAttempts}');
+        if (auth.isLockedOut) {
+          _clearServerErrors();
+          _formError = 'تم إيقاف الدخول مؤقتًا. حاولوا لاحقًا.';
+        } else {
+          _applyAuthFailure(auth.lastError ?? 'بيانات الدخول غير صحيحة.');
+        }
       });
+      // Re-run validators so field-level server errors appear under inputs.
+      _formKey.currentState?.validate();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -104,33 +130,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 24),
-                Container(
-                  height: 180,
-                  decoration: BoxDecoration(
-                    gradient: AppGradients.care,
-                    borderRadius: BorderRadius.circular(AppRadii.xl3),
+                const SizedBox(height: 10),
+                Center(
+                  child: Image.asset(
+                    'assets/images/basma_logo.png',
+                    width: 340,
+                    fit: BoxFit.contain,
+                    semanticLabel: 'بسمة — جمعية دعم الأطفال المصابين بالسرطان',
                   ),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.favorite_rounded,
-                          color: Colors.white, size: 54),
-                      SizedBox(height: 12),
-                      Text(
-                        'أهلاً بكم في رعاية بسمة',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'نحن معكم في كل خطوة',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
-                      ),
-                    ],
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'أهلاً بكم في رعاية بسمة',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.foreground,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'نحن معكم في كل خطوة',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.mutedForeground,
+                    fontSize: 14,
                   ),
                 ),
                 const SizedBox(height: 28),
@@ -139,6 +164,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: _validateUser,
+                  onChanged: (_) {
+                    if (_userServerError != null || _formError != null) {
+                      setState(_clearServerErrors);
+                    }
+                  },
                   decoration: const InputDecoration(
                     labelText: 'البريد الإلكتروني أو رقم الهاتف',
                     prefixIcon: Icon(Icons.person_outline_rounded),
@@ -152,14 +182,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _login(),
                   validator: _validatePassword,
+                  onChanged: (_) {
+                    if (_passServerError != null || _formError != null) {
+                      setState(_clearServerErrors);
+                    }
+                  },
                   decoration: InputDecoration(
                     labelText: 'كلمة المرور',
                     prefixIcon: const Icon(Icons.lock_outline_rounded),
                     errorMaxLines: 2,
                     suffixIcon: IconButton(
-                      icon: Icon(_obscure
-                          ? Icons.visibility_outlined
-                          : Icons.visibility_off_outlined),
+                      icon: Icon(
+                        _obscure
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
                       onPressed: () => setState(() => _obscure = !_obscure),
                     ),
                   ),
@@ -183,7 +220,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   'استخدموا حساب ولي الأمر المرتبط بمنصة بسمة.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: AppColors.mutedForeground, fontSize: 12),
+                    color: AppColors.mutedForeground,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),

@@ -57,6 +57,28 @@ class DateFormatAr {
     return date(d);
   }
 
+  /// Remaining time until an upcoming dose, e.g. "خلال 3 ساعات" / "بعد 2 أيام".
+  static String remainingUntil(DateTime target, {DateTime? now}) {
+    final n = now ?? _nowLocal();
+    if (target.isBefore(n)) return 'انتهت';
+
+    final diff = target.difference(n);
+    if (diff.inMinutes < 1) return 'الآن';
+    if (diff.inHours < 1) {
+      final m = diff.inMinutes;
+      return m == 1 ? 'خلال دقيقة' : 'خلال $m دقيقة';
+    }
+    if (diff.inHours < 24) {
+      final h = diff.inHours;
+      return h == 1 ? 'خلال ساعة' : 'خلال $h ساعات';
+    }
+
+    final days = _dateOnly(target).difference(_dateOnly(n)).inDays;
+    if (days == 1) return 'غدًا';
+    if (days > 1 && days <= 7) return 'بعد $days أيام';
+    return relativeDay(target, now: n);
+  }
+
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
   // Indirect now() so the rest of the app has a single seam for testing.

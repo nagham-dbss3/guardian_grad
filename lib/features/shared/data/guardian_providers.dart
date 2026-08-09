@@ -180,9 +180,9 @@ final doseReminderProvider = Provider<DoseReminderModel?>(
   (ref) => ref.watch(activeRecordProvider).doseReminder,
 );
 
-/// Resolved next dose date (API reminder, else latest discharge).
+/// Earliest upcoming dose (datetime >= now) from reminder / discharges / dose appointments.
 final nextDoseDateProvider = Provider<DateTime?>(
-  (ref) => ref.watch(activeRecordProvider).nextDoseDate,
+  (ref) => ref.watch(activeRecordProvider).upcomingDoseDate(),
 );
 
 /// Check-in / queue token for the active child (may be null / hidden).

@@ -155,7 +155,9 @@ class AuthRepository {
           return 'تعذّر التحقق من الجلسة.';
         }
         if (code == 422) {
-          return _extractValidationMessage(e.response?.data) ??
+          // Backend often returns English ("Invalid credentials") for wrong
+          // email OR wrong password — always show the Arabic form message.
+          return _mapCredentialOrValidationMessage(e.response?.data) ??
               'بيانات الدخول غير صحيحة.';
         }
         if (code == 429) {
@@ -164,7 +166,7 @@ class AuthRepository {
         if (code != null && code >= 500) {
           return 'خطأ في الخادم. حاولوا لاحقًا.';
         }
-        return _extractValidationMessage(e.response?.data) ??
+        return _mapCredentialOrValidationMessage(e.response?.data) ??
             'فشل تسجيل الدخول. حاولوا مرة أخرى.';
       case DioExceptionType.cancel:
         return 'تم إلغاء الطلب.';
@@ -173,6 +175,49 @@ class AuthRepository {
       case DioExceptionType.unknown:
         return 'حدث خطأ غير متوقع. حاولوا مرة أخرى.';
     }
+  }
+
+  /// Prefer Arabic UX copy; never surface raw English auth errors.
+  String? _mapCredentialOrValidationMessage(dynamic data) {
+    final raw = _extractValidationMessage(data);
+    if (raw == null) return null;
+
+    final normalized = raw.trim().toLowerCase();
+    const credentialHints = [
+      'invalid credentials',
+      'invalid credential',
+      'incorrect credentials',
+      'wrong credentials',
+      'unauthorized',
+      'authentication failed',
+      'login failed',
+      'email or password',
+      'invalid email or password',
+      'these credentials do not match',
+      'credentials do not match',
+    ];
+    for (final hint in credentialHints) {
+      if (normalized.contains(hint)) {
+        return 'بيانات الدخول غير صحيحة.';
+      }
+    }
+
+    // Field-level hints from Laravel-style `errors` maps.
+    if (data is Map) {
+      final errors = data['errors'];
+      if (errors is Map) {
+        if (errors.containsKey('email') || errors.containsKey('phone')) {
+          return 'البريد الإلكتروني غير صحيح';
+        }
+        if (errors.containsKey('password')) {
+          return 'كلمة السر غير صحيحة';
+        }
+      }
+    }
+
+    // Already Arabic (or unknown) — keep as-is if it looks Arabic.
+    if (RegExp(r'[\u0600-\u06FF]').hasMatch(raw)) return raw;
+    return 'بيانات الدخول غير صحيحة.';
   }
 
   String? _extractValidationMessage(dynamic data) {
