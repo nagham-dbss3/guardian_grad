@@ -149,6 +149,12 @@ class LocalCache {
     }
   }
 
+  /// Inserts or replaces a single inbox item (newest first).
+  Future<void> upsertNotification(NotificationItem item) async {
+    final list = loadNotifications().where((n) => n.id != item.id).toList();
+    await saveNotifications([item, ...list]);
+  }
+
   Future<void> clearNotifications() => _box.delete(_kNotifications);
 
   // ---- FCM device token (last registered) ---------------------------------

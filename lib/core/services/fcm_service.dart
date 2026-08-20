@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'local_cache.dart';
+import 'push_inbox_mapper.dart';
+
 /// Top-level background handler (must be a top-level / static function).
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -16,6 +19,16 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     'FCM background message: ${message.messageId} '
     'type=${message.data['type']} ref=${message.data['referenceId']}',
   );
+
+  // Persist into the notifications inbox so the tab shows it on next open.
+  try {
+    await LocalCache.instance.init();
+    final item = PushInboxMapper.fromRemoteMessage(message);
+    await LocalCache.instance.upsertNotification(item);
+    debugPrint('FCM background saved to inbox — ${item.id}');
+  } catch (e) {
+    debugPrint('FCM background inbox save failed: $e');
+  }
 }
 
 /// Thin wrapper around Firebase Cloud Messaging.

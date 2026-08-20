@@ -7,10 +7,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../models/notification_item.dart';
 import '../../models/patient_record.dart';
-import '../utils/json_converters.dart';
 import 'fcm_service.dart';
 import 'local_cache.dart';
+import 'push_inbox_mapper.dart';
 
 /// Façade over FCM (push) + flutter_local_notifications (local + scheduled).
 ///
@@ -37,8 +38,11 @@ class NotificationService {
   /// Unregister FCM token with `DELETE /guardian/device-tokens`.
   Future<void> Function(String fcmToken)? unregisterDeviceToken;
 
-  /// Optional: refresh inbox after a foreground push.
+  /// Optional: refresh inbox after a foreground push (API sync).
   Future<void> Function()? onInboxRefresh;
+
+  /// Persist an FCM push into the local notifications inbox (Hive).
+  Future<void> Function(NotificationItem item)? onPushReceived;
 
   static const _channelId = 'basma_care';
   static const _channelName = 'تذكيرات بسمة';
@@ -172,9 +176,24 @@ class NotificationService {
 
   // ---- FCM handlers -------------------------------------------------------
 
+  Future<void> _ingestPush(RemoteMessage message) async {
+    final item = PushInboxMapper.fromRemoteMessage(message);
+    try {
+      if (onPushReceived != null) {
+        await onPushReceived!(item);
+      } else {
+        // Background isolate / early startup — write Hive directly.
+        await LocalCache.instance.init();
+        await LocalCache.instance.upsertNotification(item);
+      }
+    } catch (e) {
+      debugPrint('FCM inbox upsert failed: $e');
+    }
+  }
+
   void _handleFcmForeground(RemoteMessage message) {
     final notif = message.notification;
-    final route = resolvePushDeepLink(message.data);
+    final route = PushInboxMapper.resolveDeepLink(message.data);
     final isResults = (message.data['type']?.toString() ?? '')
             .contains('lab') ||
         route.startsWith('/results');
@@ -186,42 +205,20 @@ class NotificationService {
       payload: route,
       results: isResults,
     );
-    onInboxRefresh?.call();
+    _ingestPush(message).then((_) => onInboxRefresh?.call());
   }
 
   void _handleFcmOpened(RemoteMessage message) {
-    final link = resolvePushDeepLink(message.data);
-    onDeepLink?.call(link);
+    _ingestPush(message).then((_) {
+      onInboxRefresh?.call();
+      final link = PushInboxMapper.resolveDeepLink(message.data);
+      onDeepLink?.call(link);
+    });
   }
 
   /// Maps FCM data payload → in-app route.
-  static String resolvePushDeepLink(Map<String, dynamic> data) {
-    final explicit = data['deepLink'] ?? data['deep_link'];
-    if (explicit != null && explicit.toString().isNotEmpty) {
-      return explicit.toString();
-    }
-
-    final type = (data['type'] ?? '').toString().toLowerCase();
-    final ref = const FlexibleNullableStringConverter().fromJson(
-      data['referenceId'] ?? data['reference_id'] ?? data['relatedId'],
-    );
-
-    switch (type) {
-      case 'lab_result':
-      case 'resultarrived':
-      case 'result_arrived':
-        if (ref != null && ref.isNotEmpty) return '/results/$ref';
-        return '/results';
-      case 'appointment':
-        return '/appointments';
-      case 'dose':
-      case 'dosereminder':
-      case 'dose_reminder':
-        return '/appointments';
-      default:
-        return '/notifications';
-    }
-  }
+  static String resolvePushDeepLink(Map<String, dynamic> data) =>
+      PushInboxMapper.resolveDeepLink(data);
 
   // ---- Local: immediate ---------------------------------------------------
 

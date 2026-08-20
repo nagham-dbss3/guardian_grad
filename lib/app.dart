@@ -48,6 +48,10 @@ class _BasmaAppState extends ConsumerState<BasmaApp> {
           .read(guardianRepositoryProvider)
           .unregisterDeviceToken(fcmToken: fcmToken);
     };
+    push.onPushReceived = (item) async {
+      await ref.read(guardianRepositoryProvider).upsertPushNotification(item);
+      ref.read(guardianControllerProvider.notifier).refresh();
+    };
     push.onInboxRefresh = () {
       return ref.read(guardianControllerProvider.notifier).syncNotifications();
     };

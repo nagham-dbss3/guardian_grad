@@ -347,11 +347,12 @@ class GuardianRepository {
 
   // ---- Notifications (API + Hive) -----------------------------------------
 
-  /// `GET /guardian/notifications` → replace Hive inbox.
+  /// `GET /guardian/notifications` → merge with Hive (keeps local FCM rows).
   Future<List<NotificationItem>> syncNotifications() async {
     try {
-      final list = await _remote.fetchNotifications();
-      await _cache.saveNotifications(list);
+      final remote = await _remote.fetchNotifications();
+      final merged = _mergeInbox(remote, _cache.loadNotifications());
+      await _cache.saveNotifications(merged);
       return notifications();
     } on DioException catch (e) {
       debugPrint('notifications offline/error — keeping cache: $e');
@@ -360,6 +361,26 @@ class GuardianRepository {
       debugPrint('notifications parse error — keeping cache: $e');
       return notifications();
     }
+  }
+
+  /// Persist a push so it appears in the notifications tab immediately.
+  Future<void> upsertPushNotification(NotificationItem item) async {
+    await _cache.upsertNotification(item);
+  }
+
+  /// Keep server inbox + any local FCM-only rows not yet returned by the API.
+  List<NotificationItem> _mergeInbox(
+    List<NotificationItem> remote,
+    List<NotificationItem> local,
+  ) {
+    final remoteIds = remote.map((n) => n.id).toSet();
+    final localOnly = local.where(
+      (n) =>
+          !remoteIds.contains(n.id) && isLocalPushNotificationId(n.id),
+    );
+    final merged = [...remote, ...localOnly];
+    merged.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return merged;
   }
 
   /// `POST /guardian/device-tokens`
